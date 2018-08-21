@@ -27,13 +27,13 @@
  *  @param value - cell's desired value
  *  @return - 0 if the value is not valid, 1 otherwise
  */
-int isValid(Cell **board, int row, int column, int value)
+int isValid(Cell **board, int row, int column, int value, int n, int m)
 {
     int i;
     int j;
 
-    int modifiedRow = (row/BLOCKSIZE)*BLOCKSIZE;
-    int modifiedColumn = (column/BLOCKSIZE)*BLOCKSIZE;
+    int modifiedRow = (row/m)*m;
+    int modifiedColumn = (column/n)*n;
 
 
     for (i=0;i<BOARDSIZE; i++)
@@ -42,8 +42,8 @@ int isValid(Cell **board, int row, int column, int value)
             return 0;
     }
 
-    for (i=0;i<BLOCKSIZE; i++)
-        for (j=0;j<BLOCKSIZE; j++)
+    for (i=0;i<m; i++)
+        for (j=0;j<n; j++)
         {
         	if (board[modifiedRow+i][modifiedColumn+j].value==value)
                 return 0;
@@ -61,14 +61,14 @@ int isValid(Cell **board, int row, int column, int value)
  *  @param board - the game board
  *  @return - 1 if board is valid, 0 otherwise
  */
-int isBoardValid(Cell **board)
+int isBoardValid(Cell **board, int N)
 {
     int i;
     int j;
 
-    for (i=0;i<BOARDSIZE; i++)
+    for (i=0;i<N; i++)
     {
-    	for (j=0;j<BOARDSIZE; j++)
+    	for (j=0;j<N; j++)
 		{
 			if(board[i][j].fixed==0 && board[i][j].value==0)
 				return 0;
@@ -86,7 +86,7 @@ int isBoardValid(Cell **board)
  *  @param board - the game board
  *  @return -1 if succeeded, 0 if it's not possible
  */
-int detBacktracking(int size,Cell** board){
+int detBacktracking(int size,Cell** board, int n, int m){
 	int i,j,k;
 
 	for(i=0;i<size;i++)
@@ -97,11 +97,11 @@ int detBacktracking(int size,Cell** board){
 			{
 				for (k=1;k<=size;k++)
 				{
-					if (isValid(board,i, j, k)==1)
+					if (isValid(board,i, j, k, n, m)==1)
 					{
 						board[i][j].value = k;
 
-						if (detBacktracking(size,board))
+						if (detBacktracking(size,board, n, m))
 							return 1;
 					}
 				}
@@ -131,7 +131,7 @@ int detBacktracking(int size,Cell** board){
  *  @param board - the game board
  *  @return -1 if succeeded, 0 if it's not possible
  */
-int randBacktracking(int size,Cell** board){
+int randBacktracking(int size,Cell** board, int n, int m){
 	int i,j,k;
 	int randomIndex;
 	int originalNumOfOptions;
@@ -142,7 +142,7 @@ int randBacktracking(int size,Cell** board){
 		{
 			if(board[i][j].fixed==0 && board[i][j].value==0)
 			{
-				setOptions(board,i,j);
+				setOptions(board,i,j,n,m);
 				originalNumOfOptions = board[i][j].numOfOptions;
 				for (k=0; k<originalNumOfOptions;k++)
 				{
@@ -153,7 +153,7 @@ int randBacktracking(int size,Cell** board){
 
 					board[i][j].value = board[i][j].options[randomIndex];
 
-					if (randBacktracking(size,board))
+					if (randBacktracking(size,board,n,m))
 						return 1;
 
 
@@ -170,6 +170,35 @@ int randBacktracking(int size,Cell** board){
 
 	return 1;
 }
+
+
+void autoFill(Cell **board,int N, int m, int n)
+{
+	int i;
+	int j;
+	int optionalValue;
+	int theOption = 0;
+
+	for (i=0;i<N; i++)
+		for (j=0; j<N; j++)
+		{
+			for (optionalValue = 1; optionalValue <= N; optionalValue++)
+				if (isValid(board, i, j, optionalValue, n, m)){
+					if (theOption == 0){
+						theOption = optionalValue;
+					}
+					else
+					{
+						theOption = 0;
+						break;
+					}
+				}
+
+			if (theOption != 0)
+				board[i][j].value = theOption;
+		}
+}
+
 
 
 

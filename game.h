@@ -20,17 +20,18 @@
 typedef struct cell{
 	int value;
 	int fixed;
+	int error;
 	int *options;
 	int numOfOptions;
 } Cell;
 
 Cell** init(int size);
-void printBoard(Cell **board);
-int set(Cell **board, int x, int y, int z);
+void printBoard(Cell **board, int N, int n, int m);
+int set(Cell **board, int x, int y, int z, int n, int m);
 int hint(Cell **solvedBoard, int x, int y);
 int validate(Cell **generatedBoard, Cell **userBoard);
 void exitGame(Cell **generatedBoard, Cell **userBoard, int size);
 void initUserBoard(Cell** userBoard, int fixedCells, int size);
-int restart(Cell **generatedBoard, Cell **userBoard, int size);
-int startGame();
+int restart(Cell **generatedBoard, Cell **userBoard, int n, int m);
+int startGame(int n, int m);
 #endif /* GAME_H_ */

@@ -11,7 +11,7 @@
 void addOption(int *options, int value);
 void printArray(int *arr, int size);
 void removeOption(int *options, int index);
-void setOptions(Cell **board, int row, int column);
+void setOptions(Cell **board, int row, int column, int n, int m);
 int* copyOption(int *options, int size);
 void copyIntoOption(int *fromOptions, int *toOptions, int size);
 Cell** copyBoard(Cell **currentBoard, int size);

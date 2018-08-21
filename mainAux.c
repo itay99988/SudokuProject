@@ -65,13 +65,13 @@ void removeOption(int *options, int index)
  *  @param column - cell's column
  *  @return -
  */
-void setOptions(Cell **board, int row, int column)
+void setOptions(Cell **board, int row, int column, int n, int m)
 {
 	int k;
 
 	for (k=1;k<=BOARDSIZE; k++)
 	{
-		if (isValid(board,row, column, k)==1)
+		if (isValid(board,row, column, k, n, m)==1)
 		{
 			addOption(board[row][column].options, k);
 			board[row][column].numOfOptions++;
