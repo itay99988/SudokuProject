@@ -4,6 +4,8 @@
  *  This module is in charge of calling the the startGame function in game.c
  */
 
+/*comment by Yotam: just to see if the commit works*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include "SPBufferset.h"
