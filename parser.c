@@ -61,7 +61,7 @@ void read(Board* generatedBoard, Board* userBoard)
 	 * 1 - Solve
 	 * 2 - Edit
 	 */
-	int mode = 0; /*starts in Init mode*/
+	int mode = 1; /*starts in Init mode*/
 	char input[1024]; /*maybe 256?*/
 	char *string[1024];
 
@@ -106,7 +106,7 @@ void read(Board* generatedBoard, Board* userBoard)
 
 					if((x==0 && strcmp(string[1],"0")!=0)||(y==0 && strcmp(string[2],"0")!=0)||(z==0 && strcmp(string[3],"0")!=0))
 							printf("Error: value not in range 0-%d\n",boardsize);
-					else if ((x>=0 && x<=boardsize) && (y>=0 && y<=boardsize) && (z>=0 && z<=boardsize))
+					else if (!((x>=0 && x<=boardsize) && (y>=0 && y<=boardsize) && (z>=0 && z<=boardsize)))
 						printf("Error: value not in range 0-%d\n",boardsize);
 					else
 					{
@@ -121,7 +121,7 @@ void read(Board* generatedBoard, Board* userBoard)
 
 						if((x==0 && strcmp(string[1],"0")!=0)||(y==0 && strcmp(string[2],"0")!=0))
 								printf("Error: value not in range 0-%d\n",boardsize);
-						else if ((x>=0 && x<=boardsize) && (y>=0 && y<=boardsize))
+						else if (!((x>=0 && x<=boardsize) && (y>=0 && y<=boardsize)))
 							printf("Error: value not in range 0-%d\n",boardsize);
 						else
 						{

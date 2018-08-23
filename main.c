@@ -21,5 +21,5 @@ int main(int argc, char *argv[]){
 		seed = atoi(argv[1]);
 	SP_BUFF_SET();
 	srand(seed);
-	return startGame(3,3);
+	return startGame(2,3);
 }

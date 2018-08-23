@@ -223,7 +223,6 @@ int set(Board *board, int x, int y, int z)
 		}
 		return 1;
 	}
-
 }
 /*
  * hint
