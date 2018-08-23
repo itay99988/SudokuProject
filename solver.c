@@ -13,10 +13,6 @@
 #include "game.h"
 #include "mainAux.h"
 
-#define BOARDSIZE 9
-#define BLOCKSIZE 3
-
-
 /*
  * isValid
  *
@@ -27,25 +23,29 @@
  *  @param value - cell's desired value
  *  @return - 0 if the value is not valid, 1 otherwise
  */
-int isValid(Cell **board, int row, int column, int value, int n, int m)
+int isValid(Board *board, int row, int column, int value)
 {
-    int i;
-    int j;
+    int i,j;
+    int n,m,boardsize;
+    int modifiedRow, modifiedColumn;
 
-    int modifiedRow = (row/m)*m;
-    int modifiedColumn = (column/n)*n;
+    /* dimensions definition: */
+	n=board->n;
+	m=board->m;
+	boardsize=board->boardsize;
 
-
-    for (i=0;i<BOARDSIZE; i++)
+	modifiedRow = (row/m)*m;
+	modifiedColumn = (column/n)*n;
+    for (i=0;i<boardsize; i++)
     {
-    	if (board[row][i].value==value || board[i][column].value==value)
+    	if (board->cells[row][i].value==value || board->cells[i][column].value==value)
             return 0;
     }
 
     for (i=0;i<m; i++)
         for (j=0;j<n; j++)
         {
-        	if (board[modifiedRow+i][modifiedColumn+j].value==value)
+        	if (board->cells[modifiedRow+i][modifiedColumn+j].value==value)
                 return 0;
         }
 
@@ -61,16 +61,16 @@ int isValid(Cell **board, int row, int column, int value, int n, int m)
  *  @param board - the game board
  *  @return - 1 if board is valid, 0 otherwise
  */
-int isBoardValid(Cell **board, int N)
+int isBoardValid(Board *board)
 {
-    int i;
-    int j;
+    int i,j,N;
 
+    N=board->boardsize;
     for (i=0;i<N; i++)
     {
     	for (j=0;j<N; j++)
 		{
-			if(board[i][j].fixed==0 && board[i][j].value==0)
+			if(board->cells[i][j].fixed==0 && board->cells[i][j].value==0)
 				return 0;
 		}
     }
@@ -82,26 +82,30 @@ int isBoardValid(Cell **board, int N)
  * detBacktracking
  *
  *  This function solves the board by deterministic backtracking
- *  @param size - board's size
  *  @param board - the game board
  *  @return -1 if succeeded, 0 if it's not possible
  */
-int detBacktracking(int size,Cell** board, int n, int m){
+int detBacktracking(Board* board)
+{
 	int i,j,k;
+	int size;
+
+	/* dimensions definition: */
+	size=board->boardsize;
 
 	for(i=0;i<size;i++)
 	{
 		for(j=0;j<size;j++)
 		{
-			if(board[i][j].fixed==0 && board[i][j].value==0)
+			if(board->cells[i][j].fixed==0 && board->cells[i][j].value==0)
 			{
 				for (k=1;k<=size;k++)
 				{
-					if (isValid(board,i, j, k, n, m)==1)
+					if (isValid(board,i, j, k)==1)
 					{
-						board[i][j].value = k;
+						board->cells[i][j].value = k;
 
-						if (detBacktracking(size,board, n, m))
+						if (detBacktracking(board))
 							return 1;
 					}
 				}
@@ -113,7 +117,7 @@ int detBacktracking(int size,Cell** board, int n, int m){
 					return 0;
 				}
 				*/
-				board[i][j].value=0;
+				board->cells[i][j].value=0;
 				return 0;
 			}
 
@@ -131,37 +135,42 @@ int detBacktracking(int size,Cell** board, int n, int m){
  *  @param board - the game board
  *  @return -1 if succeeded, 0 if it's not possible
  */
-int randBacktracking(int size,Cell** board, int n, int m){
+int randBacktracking(Board* board)
+{
 	int i,j,k;
+	int size;
 	int randomIndex;
 	int originalNumOfOptions;
+
+	/* dimensions definition: */
+	size=board->boardsize;
 
 	for(i=0;i<size;i++)
 	{
 		for(j=0;j<size;j++)
 		{
-			if(board[i][j].fixed==0 && board[i][j].value==0)
+			if(board->cells[i][j].fixed==0 && board->cells[i][j].value==0)
 			{
-				setOptions(board,i,j,n,m);
-				originalNumOfOptions = board[i][j].numOfOptions;
+				setOptions(board,i,j);
+				originalNumOfOptions = board->cells[i][j].numOfOptions;
 				for (k=0; k<originalNumOfOptions;k++)
 				{
-					if (board[i][j].numOfOptions==1)
+					if (board->cells[i][j].numOfOptions==1)
 						randomIndex = 0;
 					else
-						randomIndex = rand()%board[i][j].numOfOptions;
+						randomIndex = rand()%board->cells[i][j].numOfOptions;
 
-					board[i][j].value = board[i][j].options[randomIndex];
+					board->cells[i][j].value = board->cells[i][j].options[randomIndex];
 
-					if (randBacktracking(size,board,n,m))
+					if (randBacktracking(board))
 						return 1;
 
 
-					board[i][j].numOfOptions--;
-					removeOption(board[i][j].options,randomIndex);
+					board->cells[i][j].numOfOptions--;
+					removeOption(board->cells[i][j].options,randomIndex,size);
 				}
 
-				board[i][j].value=0;
+				board->cells[i][j].value=0;
 				return 0;
 
 			}
@@ -172,18 +181,21 @@ int randBacktracking(int size,Cell** board, int n, int m){
 }
 
 
-void autoFill(Cell **board,int N, int m, int n)
+void autoFill(Board *board)
 {
-	int i;
-	int j;
+	int i,j;
+	int N;
 	int optionalValue;
 	int theOption = 0;
+
+	/* dimensions definition: */
+	N=board->boardsize;
 
 	for (i=0;i<N; i++)
 		for (j=0; j<N; j++)
 		{
 			for (optionalValue = 1; optionalValue <= N; optionalValue++)
-				if (isValid(board, i, j, optionalValue, n, m)){
+				if (isValid(board, i, j, optionalValue)){
 					if (theOption == 0){
 						theOption = optionalValue;
 					}
@@ -195,11 +207,6 @@ void autoFill(Cell **board,int N, int m, int n)
 				}
 
 			if (theOption != 0)
-				board[i][j].value = theOption;
+				board->cells[i][j].value = theOption;
 		}
 }
-
-
-
-
-

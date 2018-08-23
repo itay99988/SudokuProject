@@ -1,10 +1,3 @@
-/*
- * game.h
- *
- *  Created on: 13 במאי 2018
- *      Author: Itay Cohen
- */
-
 
 #ifndef GAME_H_
 #define GAME_H_
@@ -14,6 +7,7 @@
  * contains the follwing:
  * -value field
  * -fixed field
+ * -error value
  * -optional values array
  * -number of optional values in array field
  */
@@ -25,13 +19,27 @@ typedef struct cell{
 	int numOfOptions;
 } Cell;
 
-Cell** init(int size);
-void printBoard(Cell **board, int N, int n, int m);
-int set(Cell **board, int x, int y, int z, int n, int m);
-int hint(Cell **solvedBoard, int x, int y);
-int validate(Cell **generatedBoard, Cell **userBoard);
-void exitGame(Cell **generatedBoard, Cell **userBoard, int size);
-void initUserBoard(Cell** userBoard, int fixedCells, int size);
-int restart(Cell **generatedBoard, Cell **userBoard, int n, int m);
+/* ---The board struct--
+ * this struct is used for describing a sudoku board
+ * contains the follwing:
+ * -game cells
+ * -n,m parameters
+ * -the boardsize parameter (n*m)
+ */
+typedef struct board{
+	Cell **cells;
+	int n;
+	int m;
+	int boardsize;
+} Board;
+
+Board* init(int n, int m);
+void initUserBoard(Board* userBoard, int fixedCells);
+void printBoard(Board *board);
+int set(Board *board, int x, int y, int z);
+int hint(Board *solvedBoard, int x, int y);
+int validate(Board *generatedBoard, Board *userBoard);
+int restart(Board *generatedBoard, Board *userBoard);
+void exitGame(Board *generatedBoard, Board *userBoard);
 int startGame(int n, int m);
 #endif /* GAME_H_ */

@@ -54,7 +54,7 @@ int initialization(){
  *  @param userBoard - the user's board
  *  @return -
  */
-void read(Cell** generatedBoard, Cell** userBoard)
+void read(Board* generatedBoard, Board* userBoard)
 {
 	/* Game mode:
 	 * 0 - Init
@@ -62,41 +62,37 @@ void read(Cell** generatedBoard, Cell** userBoard)
 	 * 2 - Edit
 	 */
 	int mode = 0; /*starts in Init mode*/
-	/*int markErrors = 0; */
-
 	char input[1024]; /*maybe 256?*/
 	char *string[1024];
 
 	char delimiters[] = " \t\r\n";
 	int x,y,z;
-	int n,m;
-	/*int N; */
+	int boardsize;
 	int i = 0;
-	int boardSize = 9; /*need to be updated!!!*/
 	int solved = 0; /*'set' returns 2 if puzzle was solved*/
-	/*int markErrors;*/
 	FILE *fp;
-	n = m = 3;
-	/*N=9;*/
+	/*int markErrors;*/
+
+	/* dimensions definition: */
+	boardsize=generatedBoard->boardsize;
+
 	printf("Enter your command:\n");
+	if(fgets(input, sizeof input, stdin)!=NULL)
+	{
+		string[i]=strtok(input,delimiters);
 
-	  if(fgets(input, sizeof input, stdin)!=NULL)
-	  {
-	    string[i]=strtok(input,delimiters);
-
-	    while(string[i]!=NULL)
-	    {
-	      /*printf("string [%d]=%s\n",i,string[i]);*/
-	      i++;
-	      string[i]=strtok(NULL,delimiters);
-	    }
-	  }
-	  else
-	  {
+		while(string[i]!=NULL)
+		{
+		  /*printf("string [%d]=%s\n",i,string[i]);*/
+		  i++;
+		  string[i]=strtok(NULL,delimiters);
+		}
+	}
+	else
+	{
 		  /*GOT EOF, therefore exits*/
-		  exitGame(generatedBoard, userBoard, boardSize);
-	  }
-
+		  exitGame(generatedBoard, userBoard);
+	}
 
 	  while(string[0]== '\0' || strcmp(string[0],"exit")!=0)
 	  {
@@ -109,12 +105,12 @@ void read(Cell** generatedBoard, Cell** userBoard)
 					z = atoi(string[3]);
 
 					if((x==0 && strcmp(string[1],"0")!=0)||(y==0 && strcmp(string[2],"0")!=0)||(z==0 && strcmp(string[3],"0")!=0))
-							printf("Error: value not in range 0-%d\n",boardSize);
-					else if ((x>=0 && x<=boardSize) && (y>=0 && y<=boardSize) && (z>=0 && z<=boardSize))
-						printf("Error: value not in range 0-%d\n",boardSize);
+							printf("Error: value not in range 0-%d\n",boardsize);
+					else if ((x>=0 && x<=boardsize) && (y>=0 && y<=boardsize) && (z>=0 && z<=boardsize))
+						printf("Error: value not in range 0-%d\n",boardsize);
 					else
 					{
-						solved = set(userBoard, y-1,x-1,z, n, m);
+						solved = set(userBoard, y-1,x-1,z);
 						/*implement f-i*/
 					}
 				}
@@ -124,9 +120,9 @@ void read(Cell** generatedBoard, Cell** userBoard)
 						y = atoi(string[2]);
 
 						if((x==0 && strcmp(string[1],"0")!=0)||(y==0 && strcmp(string[2],"0")!=0))
-								printf("Error: value not in range 0-%d\n",boardSize);
-						else if ((x>=0 && x<=boardSize) && (y>=0 && y<=boardSize))
-							printf("Error: value not in range 0-%d\n",boardSize);
+								printf("Error: value not in range 0-%d\n",boardsize);
+						else if ((x>=0 && x<=boardsize) && (y>=0 && y<=boardsize))
+							printf("Error: value not in range 0-%d\n",boardsize);
 						else
 						{
 							hint(generatedBoard, y-1,x-1);
@@ -144,7 +140,7 @@ void read(Cell** generatedBoard, Cell** userBoard)
 				else if (strcmp(string[0],"reset")==0 && (mode==1 || mode==2))/*available in solve or edit*/
 				{
 					/*need to update according to new rules*/
-					restart(generatedBoard, userBoard, n, m);
+					restart(generatedBoard, userBoard);
 					/*need to update solved to 0*/
 					solved = 0;
 				}
@@ -206,9 +202,9 @@ void read(Cell** generatedBoard, Cell** userBoard)
 
 					/* need to check - d!!! */
 					if((x==0 && strcmp(string[1],"0")!=0)||(y==0 && strcmp(string[2],"0")!=0))
-							printf("Error: value not in range 0-%d\n",boardSize*boardSize); /*maybe need to change boardSize*/
-					else if ((x>=0 && x<=boardSize*boardSize) && (y>=0 && y<=boardSize*boardSize) && (z>=0 && z<=boardSize*boardSize)) /*maybe need to change boardSize*/
-						printf("Error: value not in range 0-%d\n",boardSize*boardSize); /*fixxxxx this!!!! */
+							printf("Error: value not in range 0-%d\n",boardsize*boardsize); /*maybe need to change boardsize*/
+					else if ((x>=0 && x<=boardsize*boardsize) && (y>=0 && y<=boardsize*boardsize) && (z>=0 && z<=boardsize*boardsize)) /*maybe need to change boardsize*/
+						printf("Error: value not in range 0-%d\n",boardsize*boardsize); /*fixxxxx this!!!! */
 					/* ------------------ */
 					else
 					{
@@ -244,7 +240,7 @@ void read(Cell** generatedBoard, Cell** userBoard)
 				else if (strcmp(string[0],"exit")==0) /*available in every mode*/
 				{
 					/* implement exit*/
-					exitGame(generatedBoard, userBoard, boardSize);
+					exitGame(generatedBoard, userBoard);
 				}
 				else
 				{
@@ -257,8 +253,6 @@ void read(Cell** generatedBoard, Cell** userBoard)
 		  if(fgets(input, sizeof input, stdin)!=NULL)
 		  {
 				string[i]=strtok(input,delimiters);
-
-
 				while(string[i]!=NULL)
 				{
 				  /*printf("string [%d]=%s\n",i,string[i]);*/
@@ -269,13 +263,13 @@ void read(Cell** generatedBoard, Cell** userBoard)
 		  else
 		  {
 			  /*GOT EOF, therefore exits*/
-			  exitGame(generatedBoard, userBoard, boardSize);
+			  exitGame(generatedBoard, userBoard);
 		  }
 
 	  }
 
 	  /*NEED TO EXIT*/
-	  exitGame(generatedBoard, userBoard, boardSize);
+	  exitGame(generatedBoard, userBoard);
 
 }
 

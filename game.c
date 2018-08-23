@@ -15,9 +15,6 @@
 #include "mainAux.h"
 #include "parser.h"
 
-#define BOARDSIZE 9
-#define BLOCKSIZE 3
-
 /*
  * init
  *
@@ -25,12 +22,16 @@
  *  @param size - size of board
  *  @return -
  */
-Cell** init(int size){
+Board* init(int n, int m){
 
 	Cell **board;
 	int i;
 	int k,l;
+	int size;
+	Board* newBoard; /*the new board*/
+	size=n*m;
 
+	/*first of all, we will create the actual cells of the board*/
 	board = malloc(size*sizeof(Cell *));
 	if(!board)
 	{
@@ -44,7 +45,6 @@ Cell** init(int size){
 		if(!board[i])
 		{
 			printf("Error: malloc has failed\n");
-			destroyBoard(board,size);
 			exit(0);
 			return NULL;
 		}
@@ -56,11 +56,11 @@ Cell** init(int size){
 		{
 			board[k][l].value = 0;
 			board[k][l].fixed = 0;
+			board[k][l].error = 0;
 			board[k][l].options = calloc(size, sizeof(int));
 			if(!board[k][l].options)
 				{
 					printf("Error: calloc has failed\n");
-					destroyBoard(board,size);
 					exit(0);
 					return NULL;
 				}
@@ -68,7 +68,21 @@ Cell** init(int size){
 		}
 	}
 
-	return board;
+	/*now, we are about to create the whole board*/
+	newBoard = malloc(sizeof(Board));
+	if(!newBoard)
+	{
+		printf("Error: malloc has failed\n");
+		exit(0);
+		return NULL;
+	}
+	/*fill the new board*/
+	newBoard->cells = board;
+	newBoard->n = n;
+	newBoard->m = m;
+	newBoard->boardsize = size;
+
+	return newBoard;
 }
 
 /*
@@ -78,22 +92,22 @@ Cell** init(int size){
  *  and deletes everything else.
  *  @param userBoard - the solved board
  *  @param fixedCells - desired amount of fixed cells
- *  @param size - size of board
  *  @return -
  */
-void initUserBoard(Cell** userBoard, int fixedCells, int size)
+void initUserBoard(Board* userBoard, int fixedCells)
 {
 	int randRow, randColumn;
-	int i, j;
+	int i, j, size;
 
+	size = userBoard->boardsize;
 	while(fixedCells>0)
 	{
 		randColumn = rand()%size;
 		randRow = rand()%size;
 
-		if(userBoard[randRow][randColumn].fixed==0)
+		if(userBoard->cells[randRow][randColumn].fixed==0)
 		{
-			userBoard[randRow][randColumn].fixed=1;
+			userBoard->cells[randRow][randColumn].fixed=1;
 			fixedCells--;
 		}
 
@@ -101,9 +115,9 @@ void initUserBoard(Cell** userBoard, int fixedCells, int size)
 
 	for(i=0;i<size;i++)
 		for(j=0;j<size;j++)
-			if(userBoard[i][j].fixed==0)
+			if(userBoard->cells[i][j].fixed==0)
 			{
-				userBoard[i][j].value=0;
+				userBoard->cells[i][j].value=0;
 				/*maybe need to init options*/
 			}
 
@@ -116,13 +130,15 @@ void initUserBoard(Cell** userBoard, int fixedCells, int size)
  *  @param board - the solved board
  *  @return -
  */
-void printBoard(Cell **board, int N, int n, int m)
+void printBoard(Board *board)
 {
 	/*need to update n,m and N */
-	int i;
-	int j;
-	int k;
+	int i,j,k;
+	int n,m,N;
 	char specialSign;
+
+	/*definitions of dimentions: */
+	n=board->n, m=board->m, N=board->boardsize;
 
 	for (i=0; i<N; i++)
 	{
@@ -143,17 +159,17 @@ void printBoard(Cell **board, int N, int n, int m)
 			/*
 			printf(" %d",*((board+i*size)+j));*/
 
-			if (board[i][j].fixed==1)
+			if (board->cells[i][j].fixed==1)
 				specialSign = '.';
-			else if (board[i][j].error == 1)
+			else if (board->cells[i][j].error == 1)
 				specialSign = '*';
 				else
 				    specialSign = ' ';
 
-			if (board[i][j].value==0)
+			if (board->cells[i][j].value==0)
 				printf("  %c",specialSign);
 			else
-				printf("%2d%c",0, specialSign);
+				printf("%2d%c",board->cells[i][j].value, specialSign);
 
 		}
 		printf("|\n");
@@ -176,11 +192,9 @@ void printBoard(Cell **board, int N, int n, int m)
  *  @param z - value
  *  @return - 0 if set has failed. 1 if set has succeeded. 2 if puzzle is solved
  */
-int set(Cell **board, int x, int y, int z, int n, int m)
+int set(Board *board, int x, int y, int z)
 {
-	int N;
-	N = n*m;
-	if(board[x][y].fixed == 1)
+	if(board->cells[x][y].fixed == 1)
 	{
 		printf("Error: cell is fixed\n");
 		return 0;
@@ -188,21 +202,21 @@ int set(Cell **board, int x, int y, int z, int n, int m)
 
 	if(z == 0)
 	{
-		board[x][y].value = 0;
-		printBoard(board,N,n,m);
+		board->cells[x][y].value = 0;
+		printBoard(board);
 		return 1;
 	}
 
-	if(isValid(board, x, y, z, n, m) == 0)
+	if(isValid(board, x, y, z) == 0)
 	{
 		printf("Error: value is invalid\n");
 		return 0;
 	}
 	else
 	{
-		board[x][y].value = z;
-		printBoard(board,N,n,m);
-		if(isBoardValid(board,N) == 1)
+		board->cells[x][y].value = z;
+		printBoard(board);
+		if(isBoardValid(board) == 1)
 		{
 			printf("Puzzle solved successfully\n");
 			return 2;
@@ -221,9 +235,9 @@ int set(Cell **board, int x, int y, int z, int n, int m)
  *  @param y - row number
  *  @return - always 1
  */
-int hint(Cell **solvedBoard, int x, int y)
+int hint(Board *solvedBoard, int x, int y)
 {
-	printf("Hint: set cell to %d\n", solvedBoard[x][y].value);
+	printf("Hint: set cell to %d\n", solvedBoard->cells[x][y].value);
 	return 1;
 }
 /*
@@ -234,26 +248,27 @@ int hint(Cell **solvedBoard, int x, int y)
  *  @param generatedBoard - a possible stored solution
  *  @return - 1 if the solution is valid so far, else 0
  */
-int validate(Cell **generatedBoard, Cell **userBoard)
+int validate(Board *generatedBoard, Board *userBoard)
 {
-	Cell **tempBoard;
+	Board *tempBoard;
 	/* for compiler only */
 	int tempInt;
 	int solveable;
-	tempBoard = copyBoard(userBoard, BOARDSIZE);
-	tempInt = generatedBoard[0][0].value;
-	solveable = detBacktracking(BOARDSIZE,tempBoard);
+
+	tempBoard = copyBoard(userBoard);
+	tempInt = generatedBoard->cells[0][0].value;
+	solveable = detBacktracking(tempBoard);
 	if(solveable)
 	{
-		copyIntoBoard(tempBoard, generatedBoard, BOARDSIZE);
-		destroyBoard(tempBoard, BOARDSIZE);
+		copyIntoBoard(tempBoard, generatedBoard);
+		destroyBoard(tempBoard);
 		printf("Validation passed: board is solvable\n");
 		tempInt = 1;
 		return tempInt;
 	}
 	else
 	{
-		destroyBoard(tempBoard, BOARDSIZE);
+		destroyBoard(tempBoard);
 		printf("Validation failed: board is unsolvable\n");
 		return 0;
 	}
@@ -268,24 +283,21 @@ int validate(Cell **generatedBoard, Cell **userBoard)
  *  @param size - boards size
  *  @return -
  */
-int restart(Cell **generatedBoard, Cell **userBoard, int n, int m)
+int restart(Board *generatedBoard, Board *userBoard)
 {
 	int solveable, fixedCells;
-	int N;
-	N=n*m;
-	fixedCells = initialization();
 
+	fixedCells = initialization();
 	if (fixedCells == -1)
 	{
-		exitGame(generatedBoard, userBoard, BOARDSIZE);
+		exitGame(generatedBoard, userBoard);
 	}
 
-
-	resetBoard(generatedBoard,N);
-	solveable = randBacktracking(N,generatedBoard);
-	copyIntoBoard(generatedBoard, userBoard, N);
-	initUserBoard(userBoard, fixedCells, N);
-	printBoard(userBoard,N,n,m);
+	resetBoard(generatedBoard);
+	solveable = randBacktracking(generatedBoard);
+	copyIntoBoard(generatedBoard, userBoard);
+	initUserBoard(userBoard, fixedCells);
+	printBoard(userBoard);
 	return solveable;
 }
 
@@ -298,11 +310,11 @@ int restart(Cell **generatedBoard, Cell **userBoard, int n, int m)
  *  @param size - boards size
  *  @return -
  */
-void exitGame(Cell **generatedBoard, Cell **userBoard, int size)
+void exitGame(Board *generatedBoard, Board *userBoard)
 {
 	printf("Exiting...\n");
-	destroyBoard(userBoard, size);
-	destroyBoard(generatedBoard, size);
+	destroyBoard(userBoard);
+	destroyBoard(generatedBoard);
 	exit(0);
 }
 
@@ -317,12 +329,10 @@ void exitGame(Cell **generatedBoard, Cell **userBoard, int size)
 int startGame(int n, int m)
 {
 	int fixedCells;
-	Cell **generatedBoard;
-	Cell **userBoard;
-	int N;
+	Board *generatedBoard;
+	Board *userBoard;
 	int solveable;
 
-	N=n*m;
 	fixedCells = initialization();
 	if (fixedCells == -1)
 	{
@@ -330,11 +340,11 @@ int startGame(int n, int m)
 		exit(0);
 	}
 
-	generatedBoard = init(BOARDSIZE);
-	solveable = randBacktracking(9,generatedBoard);
-	userBoard = copyBoard(generatedBoard, BOARDSIZE);
-	initUserBoard(userBoard, fixedCells, BOARDSIZE);
-	printBoard(userBoard,N,n,m);
+	generatedBoard = init(n,m);
+	solveable = randBacktracking(generatedBoard);
+	userBoard = copyBoard(generatedBoard);
+	initUserBoard(userBoard, fixedCells);
+	printBoard(userBoard);
 	read(generatedBoard,userBoard);
 
 	return solveable;
