@@ -14,42 +14,6 @@
 #include "tools.h"
 
 /*
- * initialization
- *
- *  This function asks the user for the number of desired cells to fill
- *  @return - number of desired cells to fill, or -1 for EOF
- */
-int initialization(){
-	int fixedCells;
-	printf("Please enter the number of cells to fill [0-80]:\n");
-	if(scanf("%d", &fixedCells)==EOF)
-	{
-		return -1;
-		/*
-		printf("Exiting...\n");
-		exit(0);
-		*/
-	}
-
-	while (fixedCells<0 || fixedCells>80)
-	{
-		printf("Error: Invalid number of cells to fill (should be between 0 and 80)\n");
-		printf("Please enter the number of cells to fill [0-80]:\n");
-		if(scanf("%d", &fixedCells)==EOF)
-		{
-			return -1;
-			/*
-			printf("Exiting...\n");
-			exit(0);
-			*/
-		}
-	}
-
-	return fixedCells;
-}
-
-
-/*
  * read
  *
  *  This function reads the user's game-plays and interpret them - calls the right function in game
@@ -57,7 +21,7 @@ int initialization(){
  *  @param userBoard - the user's board
  *  @return -
  */
-void read(Board* generatedBoard, Board* userBoard)
+void read()
 {
 	/* Game mode:
 	 * 0 - Init
@@ -75,10 +39,11 @@ void read(Board* generatedBoard, Board* userBoard)
 	int i = 0;
 	int solved = 0; /*'set' returns 2 if puzzle was solved*/
 	FILE *fp;
+	Board* userBoard;
 
 
 	/* dimensions definition: */
-	boardsize=generatedBoard->boardsize;
+	boardsize = 9; /*will be changed*/
 
 	printf("Enter your command:\n");
 	if(fgets(input, sizeof input, stdin)!=NULL)
@@ -95,7 +60,8 @@ void read(Board* generatedBoard, Board* userBoard)
 	else
 	{
 		  /*GOT EOF, therefore exits*/
-		  exitGame(generatedBoard, userBoard);
+		  /*exitGame(userBoard);*/
+		exit(0);
 	}
 
 	  while(string[0]== '\0' || strcmp(string[0],"exit")!=0)
@@ -129,7 +95,7 @@ void read(Board* generatedBoard, Board* userBoard)
 							printf("Error: value not in range 0-%d\n",boardsize);
 						else
 						{
-							hint(generatedBoard, y-1,x-1);
+							/*hint(generatedBoard, y-1,x-1);*/
 							/*implement e-h*/
 						}
 					}
@@ -144,14 +110,14 @@ void read(Board* generatedBoard, Board* userBoard)
 							printf("Validation passed: board is solvable\n");
 						else
 							printf("Validation failed: board is unsolvable\n");						/*printf("VALIDATE");*/
-							validate(generatedBoard,userBoard);
+
 							/*implement validate*/
 					}
 
 				else if (strcmp(string[0],"reset")==0 && (mode==1 || mode==2))/*available in solve or edit*/
 				{
 					/*need to update according to new rules*/
-					restart(generatedBoard, userBoard);
+
 					/*need to update solved to 0*/
 					solved = 0;
 				}
@@ -252,7 +218,7 @@ void read(Board* generatedBoard, Board* userBoard)
 				else if (strcmp(string[0],"exit")==0) /*available in every mode*/
 				{
 					/* implement exit*/
-					exitGame(generatedBoard, userBoard);
+					exitGame(userBoard);
 				}
 				else
 				{
@@ -275,13 +241,13 @@ void read(Board* generatedBoard, Board* userBoard)
 		  else
 		  {
 			  /*GOT EOF, therefore exits*/
-			  exitGame(generatedBoard, userBoard);
+			  exitGame(userBoard);
 		  }
 
 	  }
 
 	  /*NEED TO EXIT*/
-	  exitGame(generatedBoard, userBoard);
+	  exitGame(userBoard);
 
 }
 

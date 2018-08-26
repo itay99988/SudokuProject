@@ -14,6 +14,7 @@
 #include "game.h"
 
 int main(int argc, char *argv[]){
+	/* they said there is no arguments */
 	int seed;
 	if(argc < 2)
 		seed = 0;
@@ -21,5 +22,6 @@ int main(int argc, char *argv[]){
 		seed = atoi(argv[1]);
 	SP_BUFF_SET();
 	srand(seed);
-	return startGame(3,3);
+	startGame();
+	return 1;
 }

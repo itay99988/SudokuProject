@@ -263,10 +263,12 @@ int hint(Board *solvedBoard, int x, int y)
  *  @param generatedBoard - a possible stored solution
  *  @return - 1 if the solution is valid so far, else 0
  */
-int validate(Board *generatedBoard, Board *userBoard)
+/*int validate(Board *userBoard)*/
+int validate()
 {
+	/*
 	Board *tempBoard;
-	/* for compiler only */
+
 	int tempInt;
 	int solveable;
 
@@ -287,6 +289,10 @@ int validate(Board *generatedBoard, Board *userBoard)
 		printf("Validation failed: board is unsolvable\n");
 		return 0;
 	}
+	*/
+	/*need to be updated*/
+	return 1;
+
 }
 
 static char digitToChar(int c)
@@ -438,32 +444,6 @@ void undo(Board* board, List* undoList)
 	}
 }
 
-/*
- * restart
- *
- *  This function restarts the game. clear both boards and starts the whole process from the beginning
- *  @param userBoard - the user's board
- *  @param generatedBoard - a possible stored solution
- *  @param size - boards size
- *  @return -
- */
-int restart(Board *generatedBoard, Board *userBoard)
-{
-	int solveable, fixedCells;
-
-	fixedCells = initialization();
-	if (fixedCells == -1)
-	{
-		exitGame(generatedBoard, userBoard);
-	}
-
-	resetBoard(generatedBoard);
-	solveable = randBacktracking(generatedBoard);
-	copyIntoBoard(generatedBoard, userBoard);
-	initUserBoard(userBoard, fixedCells);
-	printBoard(userBoard);
-	return solveable;
-}
 
 /*
  * exitGame
@@ -474,11 +454,11 @@ int restart(Board *generatedBoard, Board *userBoard)
  *  @param size - boards size
  *  @return -
  */
-void exitGame(Board *generatedBoard, Board *userBoard)
+void exitGame(Board *userBoard)
 {
 	printf("Exiting...\n");
 	destroyBoard(userBoard);
-	destroyBoard(generatedBoard);
+
 	exit(0);
 }
 
@@ -490,26 +470,8 @@ void exitGame(Board *generatedBoard, Board *userBoard)
  *  on the user's board before the game begins. also, it prints the board's initial status.
  *  @return -
  */
-int startGame(int n, int m)
+void startGame()
 {
-	int fixedCells;
-	Board *generatedBoard;
-	Board *userBoard;
-	int solveable;
-
-	fixedCells = initialization();
-	if (fixedCells == -1)
-	{
-		printf("Exiting...\n");
-		exit(0);
-	}
-
-	generatedBoard = init(n,m);
-	solveable = randBacktracking(generatedBoard);
-	userBoard = copyBoard(generatedBoard);
-	initUserBoard(userBoard, fixedCells);
-	printBoard(userBoard);
-	read(generatedBoard,userBoard);
-
-	return solveable;
+	printf("Sudoku\n------\n");
+	read();
 }

@@ -41,10 +41,9 @@ void initUserBoard(Board* userBoard, int fixedCells);
 void printBoard(Board *board);
 int set(Board *board, List *undoList, int x, int y, int z);
 int hint(Board *solvedBoard, int x, int y);
-int validate(Board *generatedBoard, Board *userBoard);
+int validate();
 void redo(Board* board, List* undoList);
 void undo(Board* board, List* undoList);
-int restart(Board *generatedBoard, Board *userBoard);
-void exitGame(Board *generatedBoard, Board *userBoard);
-int startGame(int n, int m);
+void exitGame(Board *userBoard);
+void startGame();
 #endif /* GAME_H_ */
