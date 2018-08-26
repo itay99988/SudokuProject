@@ -47,16 +47,16 @@ void save (Board* board, char *path)
 	fclose(f);
 }
 
-Board* load (char *path, int n, int m)
+Board* load (char *path)
 {
-	int size, i, j;
+	int size, i, j, m, n;
 	Board *board;
 	FILE *f = fopen(path, "r");
     char line[1024];
     char * data;
 
     char delimiters[] = " \t\r\n";
-    board = init(n,m);
+
     i = 0;
     j = 0;
     /*printf("------------------\n");*/

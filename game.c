@@ -161,7 +161,7 @@ void printBoard(Board *board)
 
 			if (board->cells[i][j].fixed==1)
 				specialSign = '.';
-			else if (board->cells[i][j].error == 1)
+			else if (board->cells[i][j].error == 1 && board->markErrors == 1)
 				specialSign = '*';
 				else
 				    specialSign = ' ';
@@ -192,37 +192,53 @@ void printBoard(Board *board)
  *  @param z - value
  *  @return - 0 if set has failed. 1 if set has succeeded. 2 if puzzle is solved
  */
-int set(Board *board, int x, int y, int z)
+int set(Board *board, List *undoList, int x, int y, int z)
 {
+	int prevValue;
+	int* oneMove;
+	int** moves;
+	Node* newNode;
 	if(board->cells[x][y].fixed == 1)
 	{
 		printf("Error: cell is fixed\n");
 		return 0;
 	}
 
-	if(z == 0)
-	{
-		board->cells[x][y].value = 0;
-		printBoard(board);
-		return 1;
-	}
 
-	if(isValid(board, x, y, z) == 0)
+	prevValue = board->cells[x][y].value;
+	board->cells[x][y].value = z;
+
+	/*node preparation*/
+	moves = malloc(sizeof(int*));
+	oneMove = malloc(4*sizeof(int));
+	newNode = malloc(sizeof(Node));
+	if(!moves || !oneMove || !newNode)
 	{
-		printf("Error: value is invalid\n");
+		printf("Error: malloc has failed\n");
+		exit(0);
 		return 0;
 	}
-	else
+	oneMove[0]=x,oneMove[1]=y,oneMove[2]=prevValue,oneMove[3]=z;
+	moves[0] = oneMove;
+	newNode->moves = moves;
+	newNode->movesNum = 1;
+	newNode->next = NULL;
+	newNode->prev = NULL;
+
+	/* adding the new node to the list */
+	addMove(undoList,newNode);
+
+	/* end of node preparation */
+
+	/*markErrors(board,x,y,z);*/
+	printBoard(board);
+	if(isBoardValid(board) == 1)
 	{
-		board->cells[x][y].value = z;
-		printBoard(board);
-		if(isBoardValid(board) == 1)
-		{
-			printf("Puzzle solved successfully\n");
-			return 2;
-		}
-		return 1;
+		printf("Puzzle solved successfully\n");
+		return 2;
 	}
+	return 1;
+
 }
 /*
  * hint

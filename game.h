@@ -39,7 +39,7 @@ typedef struct board{
 Board* init(int n, int m);
 void initUserBoard(Board* userBoard, int fixedCells);
 void printBoard(Board *board);
-int set(Board *board, int x, int y, int z);
+int set(Board *board, List *undoList, int x, int y, int z);
 int hint(Board *solvedBoard, int x, int y);
 int validate(Board *generatedBoard, Board *userBoard);
 void redo(Board* board, List* undoList);

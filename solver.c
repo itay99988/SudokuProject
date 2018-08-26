@@ -12,6 +12,7 @@
 #include <time.h>
 #include "game.h"
 #include "mainAux.h"
+#include "stack.h"
 
 /*
  * isValid
@@ -180,18 +181,27 @@ int randBacktracking(Board* board)
 	return 1;
 }
 
-
-void autoFill(Board *board)
+void autoFill(Board *board,List *undoList)
 {
 	int i,j;
 	int N;
-	int optionalValue;
+	int optionalValue,movesNum,prevValue;
 	int theOption = 0;
+	int* oneMove;
+	int** moves;
+	Stack* stack;
+	StackNode* poppedNode;
+	Node* newNode;
 
 	/* dimensions definition: */
 	N=board->boardsize;
 
+	/*stack*/
+	stack = initStack();
+	poppedNode = (StackNode*)malloc(sizeof(StackNode));
+
 	for (i=0;i<N; i++)
+	{
 		for (j=0; j<N; j++)
 		{
 			for (optionalValue = 1; optionalValue <= N; optionalValue++)
@@ -207,6 +217,206 @@ void autoFill(Board *board)
 				}
 
 			if (theOption != 0)
-				board->cells[i][j].value = theOption;
+				push(stack,i,j,theOption);
 		}
+	}
+
+	movesNum=stack->length;
+	moves = malloc(movesNum*sizeof(int*));
+	while(!isEmpty(stack))
+	{
+		pop(stack,poppedNode);
+		prevValue = board->cells[poppedNode->column][poppedNode->row].value;
+		board->cells[poppedNode->column][poppedNode->row].value = poppedNode->value;
+
+		oneMove = malloc(4*sizeof(int));
+		oneMove[0]=poppedNode->column,oneMove[1]=poppedNode->row,oneMove[2]=prevValue,oneMove[3]=poppedNode->value;
+		moves[stack->length] = oneMove;
+	}
+
+	/*node preparation*/
+	newNode = malloc(sizeof(Node));
+	newNode->moves = moves;
+	newNode->movesNum = movesNum;
+	newNode->next = NULL;
+	newNode->prev = NULL;
+
+	/* adding the new node to the list */
+	addMove(undoList,newNode);
+
+	/* end of node preparation */
+
+	free(poppedNode);
+	destroyStack(stack);
+}
+
+int countDetBacktracking(Board* board)
+{
+	int i,j,k;
+	int size;
+	int count;
+	count=0;
+
+	/* dimensions definition: */
+	size=board->boardsize;
+
+	for(i=0;i<size;i++)
+	{
+		for(j=0;j<size;j++)
+		{
+			if(board->cells[i][j].fixed==0 && board->cells[i][j].value==0)
+			{
+				for (k=1;k<=size;k++)
+				{
+					if (isValid(board,i, j, k)==1)
+					{
+						board->cells[i][j].value = k;
+						count = count + countDetBacktracking(board);
+					}
+				}
+
+				board->cells[i][j].value=0;
+				return count;
+			}
+		}
+	}
+
+	return 1;
+}
+
+int numSolutions(Board* board)
+{
+	int i,j,size,foundVal,count;
+	StackNode* poppedNode;
+	Stack* stack = initStack();
+
+	size=board->boardsize;
+	count=0,foundVal=0;
+	poppedNode = malloc(sizeof(StackNode));
+	if (poppedNode == NULL) {
+		exit(0);
+	}
+	/* find the first cell to deal with */
+	for(i=0;i<size;i++){
+		for(j=0;j<size;j++)
+			if(board->cells[i][j].fixed==0 && board->cells[i][j].value==0)
+			{
+				foundVal=1;
+				break;
+			}
+		if(foundVal)
+			break;
+	}
+	push(stack,i,j,1);
+
+	while(!isEmpty(stack)){
+		foundVal = 0;
+		if(isValid(board,top(stack)->column,top(stack)->row,top(stack)->value)){
+			board->cells[top(stack)->column][top(stack)->row].value = top(stack)->value;
+			/* find the first cell to deal with */
+			for(i=0;i<size;i++){
+				for(j=0;j<size;j++){
+					if(board->cells[i][j].fixed==0 && board->cells[i][j].value==0)
+					{
+						foundVal=1;
+						break;
+					}
+				}
+				if(foundVal)
+					break;
+			}
+			if(foundVal){
+				push(stack,i,j,1);
+			}
+			else{
+				count = count + 1;
+				board->cells[top(stack)->column][top(stack)->row].value = 0;
+				if(top(stack)->value<size){
+					stack->currentNode->value = stack->currentNode->value + 1;
+				}
+				else{
+					while(!isEmpty(stack) && top(stack)->value == size){
+						pop(stack,poppedNode);
+						if(!isEmpty(stack))
+							board->cells[top(stack)->column][top(stack)->row].value = 0;
+					}
+					if(!isEmpty(stack))
+						top(stack)->value = top(stack)->value + 1;
+				}
+			}
+		}
+		else{
+			if(top(stack)->value<size){
+				top(stack)->value = top(stack)->value + 1;
+			}
+			else{
+				while(!isEmpty(stack) && top(stack)->value == size){
+					pop(stack,poppedNode);
+					if(stack->length>0)
+						board->cells[top(stack)->column][top(stack)->row].value = 0;
+
+				}
+				if(!isEmpty(stack))
+					top(stack)->value = top(stack)->value + 1;
+			}
+		}
+	}
+
+	printf("Number of solutions: %d\n",count);
+	if(count == 1)
+		printf("This is a good board!\n");
+	else
+		printf("The puzzle has more than 1 solution, try to edit it further\n");
+	free(poppedNode);
+	destroyStack(stack);
+	return count;
+}
+
+void markErrors(Board *board, int row, int column, int value)
+{
+    int i,j;
+    int n,m,boardsize;
+    int modifiedRow, modifiedColumn;
+
+    /* dimensions definition: */
+	n=board->n;
+	m=board->m;
+	boardsize=board->boardsize;
+
+	modifiedRow = (row/m)*m;
+	modifiedColumn = (column/n)*n;
+    for (i=0;i<boardsize; i++)
+    {
+    	if (isValid(board, row, i, value))
+			board->cells[row][i].error = 0;
+    	else
+    		board->cells[row][i].error = 1;
+
+    	if (isValid(board, i, column, value))
+			board->cells[i][column].error = 0;
+    	else
+    		board->cells[i][column].error = 1;
+    }
+
+    for (i=0;i<m; i++)
+        for (j=0;j<n; j++)
+        {
+        	if (isValid(board,modifiedRow+i,modifiedColumn+j, value))
+        		board->cells[modifiedRow+i][modifiedColumn+j].error = 0;
+        	else
+        		board->cells[modifiedRow+i][modifiedColumn+j].error = 1;
+        }
+}
+
+
+int isThereAnError(Board *board){
+	int i,j, size;
+	size=board->boardsize;
+
+	for (i=0;i<size; i++)
+		for (j=0; j<size; j++)
+			if(board->cells[i][j].error == 1)
+				return 1;
+
+	return 0;
 }

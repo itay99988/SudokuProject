@@ -9,6 +9,9 @@
 #include "SPBufferset.h"
 #include <string.h>
 #include "game.h"
+#include "solver.h"
+#include "undoList.h"
+#include "tools.h"
 
 /*
  * initialization
@@ -68,10 +71,11 @@ void read(Board* generatedBoard, Board* userBoard)
 	char delimiters[] = " \t\r\n";
 	int x,y,z;
 	int boardsize;
+	List* undoList = initList();
 	int i = 0;
 	int solved = 0; /*'set' returns 2 if puzzle was solved*/
 	FILE *fp;
-	/*int markErrors;*/
+
 
 	/* dimensions definition: */
 	boardsize=generatedBoard->boardsize;
@@ -110,7 +114,7 @@ void read(Board* generatedBoard, Board* userBoard)
 						printf("Error: value not in range 0-%d\n",boardsize);
 					else
 					{
-						solved = set(userBoard, y-1,x-1,z);
+						solved = set(userBoard, undoList ,y-1,x-1,z);
 						/*implement f-i*/
 					}
 				}
@@ -132,9 +136,16 @@ void read(Board* generatedBoard, Board* userBoard)
 
 				else if (strcmp(string[0],"validate")==0 && solved!=2 && (mode==1 || mode==2))/*available in solve or edit*/
 					{	/*need to update according to new rules*/
-						/*printf("VALIDATE");*/
-						validate(generatedBoard,userBoard);
-						/*implement validate*/
+						if(isThereAnError(userBoard))
+							printf("Error: board contains erroneous values\n");
+
+						/*need to update the method isBoardValid(userBoard)) according to new rules*/
+						if(isBoardValid(userBoard))
+							printf("Validation passed: board is solvable\n");
+						else
+							printf("Validation failed: board is unsolvable\n");						/*printf("VALIDATE");*/
+							validate(generatedBoard,userBoard);
+							/*implement validate*/
 					}
 
 				else if (strcmp(string[0],"reset")==0 && (mode==1 || mode==2))/*available in solve or edit*/
@@ -155,14 +166,14 @@ void read(Board* generatedBoard, Board* userBoard)
 						printf("Error: File doesn't exist or cannot be opened\n");
 					}
 					else
-						/*need to call to Solve\load*/
-						printf("load or solve\n");
+						/*load*/
+						userBoard = load(string[1]);
 				}
 				else if (strcmp(string[0],"edit")==0) /*available in every mode*/
 				{
 					/* implement edit*/
 					mode = 2;
-					/*markErrors = 1;*/
+					userBoard ->markErrors = 1;
 					if (string[1]!=NULL) /*there is a parameter*/
 					{
 						fp = fopen(string[1], "r");
@@ -172,11 +183,12 @@ void read(Board* generatedBoard, Board* userBoard)
 						}
 						else
 							/*need to call to Solve\load*/
-							printf("load\n");
+							userBoard = load(string[1]);
 					}
 					else
 					{
 						/* need to initilalize an empty board */
+
 					}
 				}
 				else if (strcmp(string[0],"mark_errors")==0 && string[1]!=NULL && mode==1) /*available only in solve*/
@@ -184,7 +196,7 @@ void read(Board* generatedBoard, Board* userBoard)
 					/* implement mark errors*/
 					if (strcmp(string[1],"1")==0 || strcmp(string[1],"0")==0)
 					{
-						/*markErrors = atoi(string[1]); */
+						userBoard ->markErrors = atoi(string[1]);
 					}
 					else
 						printf("Error: the value should be 0 or 1\n");
