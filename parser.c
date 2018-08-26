@@ -132,8 +132,12 @@ void read()
 						printf("Error: File doesn't exist or cannot be opened\n");
 					}
 					else
+					{
 						/*load*/
 						userBoard = load(string[1]);
+						printBoard(userBoard);
+					}
+
 				}
 				else if (strcmp(string[0],"edit")==0) /*available in every mode*/
 				{
