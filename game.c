@@ -273,6 +273,155 @@ int validate(Board *generatedBoard, Board *userBoard)
 	}
 }
 
+static char digitToChar(int c)
+{
+	if(c==0)
+		return '_';
+	else
+		return c + '0';
+}
+
+void redo(Board* board, List* undoList)
+{
+	int x,y,z,prevValue,movesNum,i;
+	char prevChar,zChar;
+	if(undoList->head == NULL)
+	{
+		printf("Error: no moves to redo\n");
+	}
+	else
+	{
+		if(undoList->head->next == NULL && undoList->head->prev == NULL)
+		{
+			movesNum = undoList->head->movesNum;
+			x=undoList->head->moves[0][0];
+			y=undoList->head->moves[0][1];
+			prevValue = undoList->head->moves[0][2];
+			z=undoList->head->moves[0][3];
+
+			if(board->cells[x][y].value != prevValue)
+			{
+				printf("Error: no moves to redo\n");
+			}
+			else
+			{
+				for(i=0;i<movesNum;i++)
+				{
+					x=undoList->head->moves[i][0];
+					y=undoList->head->moves[i][1];
+					prevValue = undoList->head->moves[i][2];
+					z=undoList->head->moves[i][3];
+					board->cells[x][y].value = z;
+					prevChar = digitToChar(prevValue);
+					zChar = digitToChar(z);
+					printf("Redo %d,%d: from %c to %c\n",x,y,prevChar,zChar);
+				}
+			}
+		}
+		else
+		{
+			if(undoList->head->next == NULL)
+			{
+				printf("Error: no moves to redo\n");
+			}
+			else if(undoList->head->prev == NULL)
+			{
+				movesNum = undoList->head->movesNum;
+
+				x=undoList->head->moves[0][0];
+				y=undoList->head->moves[0][1];
+				prevValue = undoList->head->moves[0][2];
+				z=undoList->head->moves[0][3];
+
+				if(board->cells[x][y].value != prevValue)
+				{
+					undoList->head = undoList->head->next;
+				}
+				movesNum = undoList->head->movesNum;
+				for(i=0;i<movesNum;i++)
+				{
+					x=undoList->head->moves[i][0];
+					y=undoList->head->moves[i][1];
+					prevValue = undoList->head->moves[i][2];
+					z=undoList->head->moves[i][3];
+					board->cells[x][y].value = z;
+					prevChar = digitToChar(prevValue);
+					zChar = digitToChar(z);
+					printf("Redo %d,%d: from %c to %c\n",x,y,prevChar,zChar);
+				}
+
+			}
+			else
+			{
+				undoList->head = undoList->head->next;
+				movesNum = undoList->head->movesNum;
+				for(i=0;i<movesNum;i++)
+				{
+					x=undoList->head->moves[i][0];
+					y=undoList->head->moves[i][1];
+					prevValue = undoList->head->moves[i][2];
+					z=undoList->head->moves[i][3];
+					board->cells[x][y].value = z;
+					prevChar = digitToChar(prevValue);
+					zChar = digitToChar(z);
+					printf("Redo %d,%d: from %c to %c\n",x,y,prevChar,zChar);
+				}
+			}
+		}
+	}
+}
+
+
+void undo(Board* board, List* undoList)
+{
+	int x,y,z,prevValue,movesNum,i;
+	char prevChar,zChar;
+	if(undoList->head == NULL)
+	{
+		printf("Error: no moves to undo\n");
+	}
+	else
+	{
+		if(undoList->head->prev == NULL)
+		{
+			/*do it for each move in this node */
+			movesNum = undoList->head->movesNum;
+			for(i=0;i<movesNum;i++)
+			{
+				x=undoList->head->moves[i][0];
+				y=undoList->head->moves[i][1];
+				z=undoList->head->moves[i][2];
+				prevValue = undoList->head->moves[i][3];
+				if(board->cells[x][y].value == z)
+					printf("Error: no moves to undo\n");
+				else
+				{
+					board->cells[x][y].value = z;
+					prevChar = digitToChar(prevValue);
+					zChar = digitToChar(z);
+					printf("Undo %d,%d: from %c to %c\n",x,y,prevChar,zChar);
+				}
+			}
+		}
+		else
+		{
+			movesNum = undoList->head->movesNum;
+			for(i=0;i<movesNum;i++)
+			{
+				x=undoList->head->moves[0][0];
+				y=undoList->head->moves[0][1];
+				z=undoList->head->moves[0][2];
+				prevValue = undoList->head->moves[i][3];
+				board->cells[x][y].value = z;
+				prevChar = digitToChar(prevValue);
+				zChar = digitToChar(z);
+				printf("Undo %d,%d: from %c to %c\n",x,y,prevChar,zChar);
+			}
+			undoList->head = undoList->head->prev;
+		}
+	}
+}
+
 /*
  * restart
  *
