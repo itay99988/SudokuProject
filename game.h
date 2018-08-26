@@ -31,6 +31,7 @@ typedef struct board{
 	int n;
 	int m;
 	int boardsize;
+	int markErrors;
 } Board;
 
 Board* init(int n, int m);
