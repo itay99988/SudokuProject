@@ -157,10 +157,11 @@ void destroyBoard(Board *currentBoard)
 			free(currentBoard->cells[k]);
 		}
 	}
+
+	if(currentBoard->cells)
+		free(currentBoard->cells);
 	if(currentBoard)
-	{
 		free(currentBoard);
-	}
 }
 /*
  * copyBoard
