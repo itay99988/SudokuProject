@@ -12,5 +12,7 @@ Board* copyBoard(Board *currentBoard);
 void copyIntoBoard(Board *fromBoard, Board *toBoard);
 void resetBoard(Board *board);
 void printArray(int *arr, int size);
+void markAsFixed(Board *currentBoard);
+int isBoardFull(Board *currentBoard);
 
 #endif /* MAINAUX_H_ */

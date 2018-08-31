@@ -304,3 +304,26 @@ void printArray(int *arr, int size)
 
 	printf("\n");
 }
+
+void markAsFixed(Board *currentBoard){
+	int i, j;
+	int size = currentBoard->boardsize;
+
+	for (i =0; i<size; i++)
+		for (j =0; j<size; i++)
+			if(currentBoard->cells[i][j].value!=0)
+				currentBoard->cells[i][j].fixed=1;
+}
+
+int isBoardFull(Board *currentBoard)
+{
+	int i, j;
+	int size = currentBoard->boardsize;
+
+	for (i =0; i<size; i++)
+		for (j =0; j<size; i++)
+			if(currentBoard->cells[i][j].value==0)
+				return 0;
+
+	return 1;
+}
