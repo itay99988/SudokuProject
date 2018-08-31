@@ -306,7 +306,7 @@ void redo(Board* board, List* undoList)
 					prevChar = digitToChar(prevValue);
 					zChar = digitToChar(z);
 					markErrors(board, x, y);
-					printf("Redo %d,%d: from %c to %c\n",x,y,prevChar,zChar);
+					printf("Redo %d,%d: from %c to %c\n",y+1,x+1,prevChar,zChar);
 				}
 			}
 		}
@@ -340,7 +340,7 @@ void redo(Board* board, List* undoList)
 					prevChar = digitToChar(prevValue);
 					zChar = digitToChar(z);
 					markErrors(board, x, y);
-					printf("Redo %d,%d: from %c to %c\n",x,y,prevChar,zChar);
+					printf("Redo %d,%d: from %c to %c\n",y+1,x+1,prevChar,zChar);
 				}
 
 			}
@@ -358,7 +358,7 @@ void redo(Board* board, List* undoList)
 					prevChar = digitToChar(prevValue);
 					zChar = digitToChar(z);
 					markErrors(board, x, y);
-					printf("Redo %d,%d: from %c to %c\n",x,y,prevChar,zChar);
+					printf("Redo %d,%d: from %c to %c\n",y+1,x+1,prevChar,zChar);
 				}
 			}
 		}
@@ -394,7 +394,7 @@ void undo(Board* board, List* undoList)
 					prevChar = digitToChar(prevValue);
 					zChar = digitToChar(z);
 					markErrors(board, x, y);
-					printf("Undo %d,%d: from %c to %c\n",x,y,prevChar,zChar);
+					printf("Undo %d,%d: from %c to %c\n",y+1,x+1,prevChar,zChar);
 				}
 			}
 		}
@@ -410,7 +410,7 @@ void undo(Board* board, List* undoList)
 				board->cells[x][y].value = z;
 				prevChar = digitToChar(prevValue);
 				zChar = digitToChar(z);
-				printf("Undo %d,%d: from %c to %c\n",x,y,prevChar,zChar);
+				printf("Undo %d,%d: from %c to %c\n",y+1,x+1,prevChar,zChar);
 			}
 			undoList->head = undoList->head->prev;
 		}
