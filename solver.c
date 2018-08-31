@@ -204,6 +204,8 @@ void autoFill(Board *board,List *undoList)
 	{
 		for (j=0; j<N; j++)
 		{
+			if(board->cells[i][j].value!=0)
+				continue;
 			for (optionalValue = 1; optionalValue <= N; optionalValue++)
 				if (isValid(board, i, j, optionalValue)){
 					if (theOption == 0){
@@ -219,7 +221,8 @@ void autoFill(Board *board,List *undoList)
 			if (theOption != 0)
 			{
 				push(stack,i,j,theOption);
-				printf("Cell <%d,%d> set to %d\n",i,j,theOption);
+				printf("Cell <%d,%d> set to %d\n",j+1,i+1,theOption);
+				theOption = 0;
 			}
 		}
 	}
