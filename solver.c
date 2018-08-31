@@ -302,6 +302,9 @@ int getNumSolutions(Board* board)
 	if (poppedNode == NULL) {
 		exit(0);
 	}
+	if(!validate(board))
+		return 0;
+
 	/* find the first cell to deal with */
 	for(i=0;i<size;i++){
 		for(j=0;j<size;j++)
@@ -313,8 +316,8 @@ int getNumSolutions(Board* board)
 		if(foundVal)
 			break;
 	}
-	push(stack,i,j,1);
 
+	push(stack,i,j,1);
 	while(!isEmpty(stack)){
 		foundVal = 0;
 		if(isValid(board,top(stack)->column,top(stack)->row,top(stack)->value)){
@@ -368,11 +371,6 @@ int getNumSolutions(Board* board)
 		}
 	}
 
-	printf("Number of solutions: %d\n",count);
-	if(count == 1)
-		printf("This is a good board!\n");
-	else
-		printf("The puzzle has more than 1 solution, try to edit it further\n");
 	free(poppedNode);
 	destroyStack(stack);
 	return count;
