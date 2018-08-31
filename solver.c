@@ -217,7 +217,10 @@ void autoFill(Board *board,List *undoList)
 				}
 
 			if (theOption != 0)
+			{
 				push(stack,i,j,theOption);
+				printf("Cell <%d,%d> set to %d\n",i,j,theOption);
+			}
 		}
 	}
 
@@ -284,7 +287,7 @@ int countDetBacktracking(Board* board)
 	return 1;
 }
 
-int numSolutions(Board* board)
+int getNumSolutions(Board* board)
 {
 	int i,j,size,foundVal,count;
 	StackNode* poppedNode;
@@ -372,11 +375,12 @@ int numSolutions(Board* board)
 	return count;
 }
 
-void markErrors(Board *board, int row, int column, int value)
+void markErrors(Board *board, int row, int column)
 {
     int i,j;
     int n,m,boardsize;
     int modifiedRow, modifiedColumn;
+    int value;
 
     /* dimensions definition: */
 	n=board->n;
@@ -387,24 +391,52 @@ void markErrors(Board *board, int row, int column, int value)
 	modifiedColumn = (column/n)*n;
     for (i=0;i<boardsize; i++)
     {
-    	if (isValid(board, row, i, value))
-			board->cells[row][i].error = 0;
-    	else
-    		board->cells[row][i].error = 1;
+    	value = board->cells[row][i].value;
+    	if(value !=0)
+    	{
+    		board->cells[row][i].value = 0;
+        	if (isValid(board, row, i, value))
+    			board->cells[row][i].error = 0;
+        	else
+        		board->cells[row][i].error = 1;
 
-    	if (isValid(board, i, column, value))
-			board->cells[i][column].error = 0;
+        	board->cells[row][i].value = value;
+    	}
     	else
-    		board->cells[i][column].error = 1;
+    		board->cells[row][i].error = 0;
+
+    	value = board->cells[i][column].value;
+    	if(value !=0)
+    	{
+    		board->cells[i][column].value = 0;
+        	if (isValid(board, i, column, value))
+    			board->cells[i][column].error = 0;
+        	else
+        		board->cells[i][column].error = 1;
+
+        	board->cells[i][column].value = value;
+    	}
+    	else
+    		board->cells[i][column].error = 0;
     }
 
     for (i=0;i<m; i++)
         for (j=0;j<n; j++)
         {
-        	if (isValid(board,modifiedRow+i,modifiedColumn+j, value))
-        		board->cells[modifiedRow+i][modifiedColumn+j].error = 0;
+
+        	value = board->cells[modifiedRow+i][modifiedColumn+j].value;
+        	if(value !=0)
+        	{
+        		board->cells[modifiedRow+i][modifiedColumn+j].value = 0;
+        		if (isValid(board,modifiedRow+i,modifiedColumn+j, value))
+        			board->cells[modifiedRow+i][modifiedColumn+j].error = 0;
+            	else
+            		board->cells[modifiedRow+i][modifiedColumn+j].error = 1;
+
+        		board->cells[modifiedRow+i][modifiedColumn+j].value = value;
+        	}
         	else
-        		board->cells[modifiedRow+i][modifiedColumn+j].error = 1;
+        		board->cells[modifiedRow+i][modifiedColumn+j].error = 0;
         }
 }
 
