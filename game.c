@@ -203,7 +203,6 @@ int set(Board *board, List *undoList, int x, int y, int z, int gameMode)
 	if(board->cells[x][y].fixed == 1)
 	{
 		printf("Error: cell is fixed\n");
-		printf("actuval value %d and actuval fix %d\n",board->cells[x][y].value,board->cells[x][y].fixed); /*add*/
 		return 0;
 	}
 

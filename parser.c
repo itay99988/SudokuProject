@@ -86,7 +86,7 @@ void read()
 						printf("Error: value not in range 0-%d\n",boardsize);
 					else
 					{
-						solved = set(userBoard, undoList ,x-1,y-1,z, mode);
+						solved = set(userBoard, undoList ,y-1,x-1,z, mode);
 
 						if (solved == 2)
 						{
@@ -109,9 +109,9 @@ void read()
 						}
 						else
 						{
-							if (userBoard->cells[x-1][y-1].fixed==1)
+							if (userBoard->cells[y-1][x-1].fixed==1)
 								printf("Error: cell is fixed\n");
-							else if (userBoard->cells[x-1][y-1].value!=0)
+							else if (userBoard->cells[y-1][x-1].value!=0)
 								printf("Error: cell already contains a value\n");
 							else
 							{
@@ -121,7 +121,7 @@ void read()
 								if (solved==0)
 									printf("Error: board is unsolvable\n");
 								else
-									hint(fullBoard,x-1,y-1);
+									hint(fullBoard,y-1,x-1);
 								/*free the solved board's memory*/
 								destroyBoard(fullBoard);
 							}
