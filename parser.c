@@ -253,11 +253,9 @@ void read()
 						{
 							save(userBoard, string[1]);
 							printf("Saved to: %s\n", string[1]);
-							printf("itay2");
 						}
 						else
 							printf("Error: board validation failed\n");
-						printf("itay");
 						markAsFixed(userBoard); /*implement I - check if this is the acctual need*/
 
 					}
