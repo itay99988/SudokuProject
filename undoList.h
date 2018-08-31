@@ -1,6 +1,8 @@
 #ifndef UNDOLIST_H_
 #define UNDOLIST_H_
 
+#include "game.h"
+
 typedef struct Node {
     int **moves;
     int movesNum;

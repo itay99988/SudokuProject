@@ -57,16 +57,6 @@ void clearBeyond(Node* cur)
 	}
 }
 
-void reset(Board* board, List* undoList){
-	while(undoList->head->prev != NULL){
-		undo(board,undoList);
-	}
-	undo(board,undoList);
-
-	destroyList(undoList);
-	undoList = initList();
-}
-
 /* assuming that we already erased all the forward nodes
  * and we got a pointer to the previous node.
  */
