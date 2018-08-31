@@ -25,6 +25,7 @@ int ilpSolve(Board *userBoard)
 			{
 				for (k=1;k<=size;k++)
 				{
+
 					if (isValid(userBoard,i, j, k)==1)
 					{
 						userBoard->cells[i][j].value = k;
@@ -32,6 +33,7 @@ int ilpSolve(Board *userBoard)
 						if (detBacktracking(userBoard))
 							return 1;
 					}
+
 				}
 
 				userBoard->cells[i][j].value=0;
