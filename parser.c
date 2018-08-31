@@ -82,14 +82,17 @@ void read()
 
 					if((x==0 && strcmp(string[1],"0")!=0)||(y==0 && strcmp(string[2],"0")!=0)||(z==0 && strcmp(string[3],"0")!=0))
 							printf("Error: value not in range 0-%d\n",boardsize);
-					else if (!((x>=0 && x<=boardsize) && (y>=0 && y<=boardsize) && (z>=0 && z<=boardsize)))
+					else if (!((x>=1 && x<=boardsize) && (y>=1 && y<=boardsize) && (z>=0 && z<=boardsize)))
 						printf("Error: value not in range 0-%d\n",boardsize);
 					else
 					{
-						solved = set(userBoard, undoList ,y-1,x-1,z);
+						solved = set(userBoard, undoList ,x-1,y-1,z, mode);
 
 						if (solved == 2)
+						{
 							mode = 0; /* puzzle solved, game mode is INIT */
+							solved = 0;
+						}
 					}
 				}
 				else if (strcmp(string[0],"hint")==0 && string[1]!=NULL && string[2]!=NULL && solved!=2 && mode==1) /*available only in solve*/
@@ -98,17 +101,17 @@ void read()
 						y = atoi(string[2]);
 
 						if((x==0 && strcmp(string[1],"0")!=0)||(y==0 && strcmp(string[2],"0")!=0))
-								printf("Error: value not in range 0-%d\n",boardsize);
-						else if (!((x>=0 && x<=boardsize) && (y>=0 && y<=boardsize)))
-							printf("Error: value not in range 0-%d\n",boardsize);
+								printf("Error: value not in range 1-%d\n",boardsize);
+						else if (!((x>=1 && x<=boardsize) && (y>=1 && y<=boardsize)))
+							printf("Error: value not in range 1-%d\n",boardsize);
 						else if (isThereAnError(userBoard)){
 							printf("Error: board contains erroneous values\n");
 						}
 						else
 						{
-							if (userBoard->cells[x][y].fixed==1)
+							if (userBoard->cells[x-1][y-1].fixed==1)
 								printf("Error: cell is fixed\n");
-							else if (userBoard->cells[x][y].value!=0)
+							else if (userBoard->cells[x-1][y-1].value!=0)
 								printf("Error: cell already contains a value\n");
 							else
 							{
@@ -118,7 +121,7 @@ void read()
 								if (solved==0)
 									printf("Error: board is unsolvable\n");
 								else
-									hint(fullBoard,x,y);
+									hint(fullBoard,x-1,y-1);
 								/*free the solved board's memory*/
 								destroyBoard(fullBoard);
 							}
@@ -242,7 +245,7 @@ void read()
 				{
 					if (mode==1)
 					{
-						save(userBoard, string[1]);
+						save(userBoard, string[1], mode);
 						printf("Saved to: %s\n", string[1]);
 					}
 					else /*mode==2*/
@@ -252,7 +255,7 @@ void read()
 
 						if(validate(userBoard))
 						{
-							save(userBoard, string[1]);
+							save(userBoard, string[1], mode);
 							printf("Saved to: %s\n", string[1]);
 						}
 						else

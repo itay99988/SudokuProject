@@ -194,7 +194,7 @@ void printBoard(Board *board)
  *  @param z - value
  *  @return - 0 if set has failed. 1 if set has succeeded. 2 if puzzle is solved. 3 if puzzle solution erroneous
  */
-int set(Board *board, List *undoList, int x, int y, int z)
+int set(Board *board, List *undoList, int x, int y, int z, int gameMode)
 {
 	int prevValue;
 	int* oneMove;
@@ -203,6 +203,7 @@ int set(Board *board, List *undoList, int x, int y, int z)
 	if(board->cells[x][y].fixed == 1)
 	{
 		printf("Error: cell is fixed\n");
+		printf("actuval value %d and actuval fix %d\n",board->cells[x][y].value,board->cells[x][y].fixed); /*add*/
 		return 0;
 	}
 
@@ -235,16 +236,21 @@ int set(Board *board, List *undoList, int x, int y, int z)
 	markErrors(board,x,y);
 	printBoard(board);
 
-	if(isBoardFull(board))
+
+	if (gameMode==1)  /*relevant only to solve mode */
 	{
-		if (isThereAnError(board))
-			printf("Puzzle solution erroneous\n");
-		else
+		if(isBoardFull(board))
 		{
-			printf("Puzzle solved successfully\n");
-			return 2;
+			if (isThereAnError(board))
+				printf("Puzzle solution erroneous\n");
+			else
+			{
+				printf("Puzzle solved successfully\n");
+				return 2;
+			}
 		}
 	}
+
 
 	return 1;
 
@@ -410,6 +416,7 @@ void undo(Board* board, List* undoList)
 				board->cells[x][y].value = z;
 				prevChar = digitToChar(prevValue);
 				zChar = digitToChar(z);
+				markErrors(board, x, y);
 				printf("Undo %d,%d: from %c to %c\n",y+1,x+1,prevChar,zChar);
 			}
 			undoList->head = undoList->head->prev;

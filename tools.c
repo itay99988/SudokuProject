@@ -14,7 +14,7 @@
 #include "parser.h"
 
 
-void save (Board* board, char *path)
+void save (Board* board, char *path, int gameMode)
 {
 	int i, j;
 	int n,m,size;
@@ -36,7 +36,7 @@ void save (Board* board, char *path)
 			for(j=0;j<size;j++)
 			{
 				fprintf(f,"%d",board->cells[i][j].value);
-				if (board->cells[i][j].fixed==1)
+				if (board->cells[i][j].fixed==1 || (gameMode==2 && board->cells[i][j].value!=0))
 					fprintf(f,".");
 				else
 					fprintf(f," ");
