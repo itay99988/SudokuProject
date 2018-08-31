@@ -14,6 +14,7 @@
 #include "solver.h"
 #include "mainAux.h"
 #include "parser.h"
+#include "undoList.h"
 
 /*
  * init
@@ -190,7 +191,7 @@ void printBoard(Board *board)
  *  @param x - column number
  *  @param y - row number
  *  @param z - value
- *  @return - 0 if set has failed. 1 if set has succeeded. 2 if puzzle is solved
+ *  @return - 0 if set has failed. 1 if set has succeeded. 2 if puzzle is solved. 3 if puzzle solution erroneous
  */
 int set(Board *board, List *undoList, int x, int y, int z)
 {
@@ -230,13 +231,20 @@ int set(Board *board, List *undoList, int x, int y, int z)
 
 	/* end of node preparation */
 
-	/*markErrors(board,x,y,z);*/
+	markErrors(board,x,y);
 	printBoard(board);
-	if(isBoardValid(board) == 1)
+
+	if(isBoardFull(board))
 	{
-		printf("Puzzle solved successfully\n");
-		return 2;
+		if (isThereAnError(board))
+			printf("Puzzle solution erroneous\n");
+		else
+		{
+			printf("Puzzle solved successfully\n");
+			return 2;
+		}
 	}
+
 	return 1;
 
 }
@@ -250,10 +258,9 @@ int set(Board *board, List *undoList, int x, int y, int z)
  *  @param y - row number
  *  @return - always 1
  */
-int hint(Board *solvedBoard, int x, int y)
+void hint(Board *solvedBoard, int x, int y)
 {
 	printf("Hint: set cell to %d\n", solvedBoard->cells[x][y].value);
-	return 1;
 }
 /*
  * validate
@@ -336,6 +343,7 @@ void redo(Board* board, List* undoList)
 					board->cells[x][y].value = z;
 					prevChar = digitToChar(prevValue);
 					zChar = digitToChar(z);
+					markErrors(board, x, y);
 					printf("Redo %d,%d: from %c to %c\n",x,y,prevChar,zChar);
 				}
 			}
@@ -369,6 +377,7 @@ void redo(Board* board, List* undoList)
 					board->cells[x][y].value = z;
 					prevChar = digitToChar(prevValue);
 					zChar = digitToChar(z);
+					markErrors(board, x, y);
 					printf("Redo %d,%d: from %c to %c\n",x,y,prevChar,zChar);
 				}
 
@@ -386,6 +395,7 @@ void redo(Board* board, List* undoList)
 					board->cells[x][y].value = z;
 					prevChar = digitToChar(prevValue);
 					zChar = digitToChar(z);
+					markErrors(board, x, y);
 					printf("Redo %d,%d: from %c to %c\n",x,y,prevChar,zChar);
 				}
 			}
@@ -421,6 +431,7 @@ void undo(Board* board, List* undoList)
 					board->cells[x][y].value = z;
 					prevChar = digitToChar(prevValue);
 					zChar = digitToChar(z);
+					markErrors(board, x, y);
 					printf("Undo %d,%d: from %c to %c\n",x,y,prevChar,zChar);
 				}
 			}
@@ -444,6 +455,18 @@ void undo(Board* board, List* undoList)
 	}
 }
 
+void reset(Board* board, List* undoList){
+	while(undoList->head->prev != NULL){
+		undo(board,undoList);
+	}
+	undo(board,undoList);
+
+	destroyList(undoList);
+	undoList = initList();
+
+	printf("Board reset\n");
+}
+
 
 /*
  * exitGame
@@ -454,9 +477,11 @@ void undo(Board* board, List* undoList)
  *  @param size - boards size
  *  @return -
  */
-void exitGame(Board *userBoard)
+void exitGame(Board *userBoard, List *undoList)
 {
 	printf("Exiting...\n");
+
+	destroyList(undoList);
 	destroyBoard(userBoard);
 
 	exit(0);
