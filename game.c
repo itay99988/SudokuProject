@@ -15,6 +15,7 @@
 #include "mainAux.h"
 #include "parser.h"
 #include "undoList.h"
+#include "ILPSolver.h"
 
 /*
  * init
@@ -262,45 +263,6 @@ void hint(Board *solvedBoard, int x, int y)
 {
 	printf("Hint: set cell to %d\n", solvedBoard->cells[x][y].value);
 }
-/*
- * validate
- *
- *  This function validates a specific solution of the user
- *  @param userBoard - the user's board
- *  @param generatedBoard - a possible stored solution
- *  @return - 1 if the solution is valid so far, else 0
- */
-/*int validate(Board *userBoard)*/
-int validate()
-{
-	/*
-	Board *tempBoard;
-
-	int tempInt;
-	int solveable;
-
-	tempBoard = copyBoard(userBoard);
-	tempInt = generatedBoard->cells[0][0].value;
-	solveable = detBacktracking(tempBoard);
-	if(solveable)
-	{
-		copyIntoBoard(tempBoard, generatedBoard);
-		destroyBoard(tempBoard);
-		printf("Validation passed: board is solvable\n");
-		tempInt = 1;
-		return tempInt;
-	}
-	else
-	{
-		destroyBoard(tempBoard);
-		printf("Validation failed: board is unsolvable\n");
-		return 0;
-	}
-	*/
-	/*need to be updated*/
-	return 1;
-
-}
 
 static char digitToChar(int c)
 {
@@ -486,6 +448,23 @@ void exitGame(Board *userBoard, List *undoList)
 
 	exit(0);
 }
+
+/*
+ * validate
+ *
+ *  This function gets the actual user board, makes a copy of it and then runs ILP on the copy
+ *  in order if the board is solvable.
+ *  @param board - the actual game board (not a copy of it)
+ *  @return -1 if solveable, 0 if not
+ */
+int validate(Board* board){
+	Board* boardCopy = copyBoard(board);
+	int result = ilpSolve(board);
+	/* the copyboard function allocates some momory, hence we have to free this memory */
+	destroyBoard(boardCopy);
+	return result;
+}
+
 
 /*
  * startGame

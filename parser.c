@@ -12,8 +12,8 @@
 #include "solver.h"
 #include "undoList.h"
 #include "tools.h"
-#include "mainAux.h"
 #include "solver.h"
+#include "mainAux.h"
 #include "ILPSolver.h"
 
 /*
@@ -119,6 +119,8 @@ void read()
 									printf("Error: board is unsolvable\n");
 								else
 									hint(fullBoard,x,y);
+								/*free the solved board's memory*/
+								destroyBoard(fullBoard);
 							}
 						}
 					}
@@ -127,9 +129,8 @@ void read()
 					{	/*need to update according to new rules*/
 						if(isThereAnError(userBoard))
 							printf("Error: board contains erroneous values\n");
-
-						/*need to update the method isBoardValid(userBoard)) according to new rules*/
-						if(isBoardValid(userBoard))
+						/*need to update the method validate(userBoard)) according to new rules*/
+						if(validate(userBoard))
 							printf("Validation passed: board is solvable\n");
 						else
 							printf("Validation failed: board is unsolvable\n");
@@ -248,14 +249,15 @@ void read()
 						if(isThereAnError(userBoard))
 							printf("Error:board contains erroneous values\n");
 
-						if(isBoardValid(userBoard))
+						if(validate(userBoard))
 						{
 							save(userBoard, string[1]);
 							printf("Saved to: %s\n", string[1]);
+							printf("itay2");
 						}
 						else
 							printf("Error: board validation failed\n");
-
+						printf("itay");
 						markAsFixed(userBoard); /*implement I - check if this is the acctual need*/
 
 					}
