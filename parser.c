@@ -126,14 +126,15 @@ void read()
 					}
 
 				else if (strcmp(string[0],"validate")==0 && solved!=2 && (mode==1 || mode==2))/*available in solve or edit*/
-					{	/*need to update according to new rules*/
+					{
 						if(isThereAnError(userBoard))
 							printf("Error: board contains erroneous values\n");
-						/*need to update the method validate(userBoard)) according to new rules*/
-						if(validate(userBoard))
-							printf("Validation passed: board is solvable\n");
-						else
-							printf("Validation failed: board is unsolvable\n");
+						else{
+							if(validate(userBoard))
+								printf("Validation passed: board is solvable\n");
+							else
+								printf("Validation failed: board is unsolvable\n");
+						}
 					}
 
 				else if (strcmp(string[0],"reset")==0 && (mode==1 || mode==2))/*available in solve or edit*/
