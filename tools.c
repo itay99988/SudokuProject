@@ -25,7 +25,8 @@ void save (Board* board, char *path)
 
 	if (f == NULL)
 	{
-	    printf("Error opening file!\n"); /*what should we do???*/
+		/* printf("Error opening file!\n"); what should we do???*/
+		printf("Error: File cannot be created or modified\n");
 	}
 	else
 	{
