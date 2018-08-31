@@ -8,6 +8,7 @@
 */
 
 #include "game.h"
+#include "solver.h"
 
 int ilpSolve(Board *userBoard)
 {
@@ -30,7 +31,7 @@ int ilpSolve(Board *userBoard)
 					{
 						userBoard->cells[i][j].value = k;
 
-						if (detBacktracking(userBoard))
+						if (ilpSolve(userBoard))
 							return 1;
 					}
 
