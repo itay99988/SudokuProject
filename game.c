@@ -459,8 +459,8 @@ void exitGame(Board *userBoard, List *undoList)
  */
 int validate(Board* board){
 	Board* boardCopy = copyBoard(board);
-	int result = ilpSolve(board);
-	/* the copyboard function allocates some momory, hence we have to free this memory */
+	int result = ilpSolve(boardCopy);
+	/* the copyboard function allocates some memory, hence we have to free this memory */
 	destroyBoard(boardCopy);
 	return result;
 }
