@@ -315,6 +315,15 @@ void markAsFixed(Board *currentBoard){
 				currentBoard->cells[i][j].fixed=1;
 }
 
+void clearFixed(Board *currentBoard){
+	int i, j;
+	int size = currentBoard->boardsize;
+
+	for (i =0; i<size; i++)
+		for (j =0; j<size; j++)
+				currentBoard->cells[i][j].fixed=0;
+}
+
 int isBoardFull(Board *currentBoard)
 {
 	int i, j;
