@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include "SPBufferset.h"
 #include <string.h>
+#include <ctype.h>
 #include "game.h"
 #include "solver.h"
 #include "undoList.h"
@@ -15,6 +16,29 @@
 #include "solver.h"
 #include "mainAux.h"
 #include "ILPSolver.h"
+
+
+
+
+
+int isInt(char *string)
+{
+        int i, stringLength = strlen(string);
+
+        for(i = 0; i < stringLength; i++)
+        {
+                if(isdigit(string[i]) == 0) /*|| ispunct(string[i]) != 0 ... */
+                        break;
+        }
+
+        if(i != stringLength)
+                return 0;
+        else
+                return 1;
+
+}
+
+
 
 /*
  * read
@@ -74,7 +98,7 @@ void read()
 	  {
 		  if(string[0]!='\0')
 		  {
-			  	if ((strcmp(string[0],"set")==0) && (string[1]!=NULL) && (string[2]!=NULL) && (string[3]!=NULL) && (solved!=2) && (mode==1 || mode==2)) /*available in solve or edit*/
+			  	if ((strcmp(string[0],"set")==0) && string[1]!=NULL && isInt(string[1]) && string[2]!=NULL && isInt(string[2]) && string[3]!=NULL && isInt(string[3]) && (solved!=2) && (mode==1 || mode==2)) /*available in solve or edit*/
 				{	/*need to update according to new rules - check if solved is still relevant*/
 					x = atoi(string[1]);
 					y = atoi(string[2]);
@@ -97,7 +121,7 @@ void read()
 						}
 					}
 				}
-				else if (strcmp(string[0],"hint")==0 && string[1]!=NULL && string[2]!=NULL && solved!=2 && mode==1) /*available only in solve*/
+				else if (strcmp(string[0],"hint")==0 && string[1]!=NULL && isInt(string[1]) && string[2]!=NULL && isInt(string[2]) && solved!=2 && mode==1) /*available only in solve*/
 					{/*need to update according to new rules*/
 						x = atoi(string[1]);
 						y = atoi(string[2]);
@@ -175,7 +199,7 @@ void read()
 					/* implement printBoard*/
 					printBoard(userBoard);
 				}
-				else if (strcmp(string[0],"generate")==0 && string[1]!=NULL && string[2]!=NULL && mode==2) /*available only in edit*/
+				else if (strcmp(string[0],"generate")==0 && string[1]!=NULL && isInt(string[1]) && string[2]!=NULL && isInt(string[2]) && mode==2) /*available only in edit*/
 				{
 					/* implement generate*/
 					x = atoi(string[1]);
