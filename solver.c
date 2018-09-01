@@ -14,6 +14,9 @@
 #include "mainAux.h"
 #include "stack.h"
 
+/* private methods: */
+void markErrors(Board *board, int row, int column);
+
 /*
  * isValid
  *
@@ -234,24 +237,26 @@ void autoFill(Board *board,List *undoList)
 		pop(stack,poppedNode);
 		prevValue = board->cells[poppedNode->column][poppedNode->row].value;
 		board->cells[poppedNode->column][poppedNode->row].value = poppedNode->value;
-
+		markErrors(board,poppedNode->column,poppedNode->row);
 		oneMove = malloc(4*sizeof(int));
 		oneMove[0]=poppedNode->column,oneMove[1]=poppedNode->row,oneMove[2]=prevValue,oneMove[3]=poppedNode->value;
 		moves[stack->length] = oneMove;
 	}
+	/* update the list iff the autofill actually did something */
+	if(movesNum != 0)
+	{
+		/*node preparation*/
+		newNode = malloc(sizeof(Node));
+		newNode->moves = moves;
+		newNode->movesNum = movesNum;
+		newNode->next = NULL;
+		newNode->prev = NULL;
 
-	/*node preparation*/
-	newNode = malloc(sizeof(Node));
-	newNode->moves = moves;
-	newNode->movesNum = movesNum;
-	newNode->next = NULL;
-	newNode->prev = NULL;
+		/* adding the new node to the list */
+		addMove(undoList,newNode);
 
-	/* adding the new node to the list */
-	addMove(undoList,newNode);
-
-	/* end of node preparation */
-
+		/* end of node preparation */
+	}
 	free(poppedNode);
 	destroyStack(stack);
 }
