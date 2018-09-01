@@ -16,6 +16,7 @@
 #include "parser.h"
 #include "undoList.h"
 #include "ILPSolver.h"
+#include "tools.h"
 
 /*
  * init
@@ -453,6 +454,90 @@ void exitGame(Board *userBoard, List *undoList)
 	destroyBoard(userBoard);
 
 	exit(0);
+}
+
+void doSave(Board* userBoard, char *path, int mode)
+{
+	if (mode==1)
+	{
+		save(userBoard, path, mode);
+	}
+	else /*mode==2*/
+	{
+		if(isThereAnError(userBoard))
+			printf("Error:board contains erroneous values\n");
+		else if(validate(userBoard))
+				save(userBoard, path, mode);
+			else
+				printf("Error: board validation failed\n");
+			/*markAsFixed(userBoard); implement I - check if this is the acctual need*/
+	}
+}
+
+
+Board* doSolve(char *path, List* undoList)
+{
+	Board* userBoard;
+	FILE* fp;
+	fp = fopen(path, "r");
+	if (fp==NULL)
+	{
+		printf("Error: File doesn't exist or cannot be opened\n");
+	}
+	else
+	{
+		userBoard = load(path);
+		destroyList(undoList);
+		undoList = initList();
+		printBoard(userBoard);
+	}
+
+	fclose(fp);
+	return userBoard;
+	/*
+	if (fp != NULL)
+		free(fp);
+	*/
+}
+
+Board* doEdit(char *path, List* undoList)
+{
+	FILE* fp;
+	Board* userBoard;
+
+	if (path!=NULL) /*there is a parameter*/
+	{
+		fp = fopen(path, "r");
+		if (fp==NULL)
+		{
+			printf("Error: File doesn't exist or cannot be opened\n");
+		}
+		else
+		{
+			userBoard = load(path);
+			userBoard->markErrors = 1;/* mark errors parameter is 1 */
+			destroyList(undoList);
+			undoList = initList();
+			printBoard(userBoard);
+		}
+
+	}
+	else
+	{
+		/* need to initilalize an empty board */
+		userBoard = init(3, 3); /* initiate 3*3 - maybe change it to a DEFINE or something */
+		userBoard->markErrors = 1;/* mark errors parameter is 1 */
+		destroyList(undoList);
+		undoList = initList();
+		printBoard(userBoard);
+	}
+
+	fclose(fp);
+	return userBoard;
+	/*
+	if (fp != NULL)
+		free(fp);
+	*/
 }
 
 /*

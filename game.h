@@ -45,6 +45,9 @@ void redo(Board* board, List* undoList);
 void undo(Board* board, List* undoList);
 void reset(Board* board, List* undoList);
 void exitGame(Board *userBoard, List* undoList);
+void doSave(Board* board, char *path, int gameMode);
+Board* doSolve(char *path, List* undoList);
+Board* doEdit(char *path, List* undoList);
 int validate(Board* board);
 void startGame();
 #endif /* GAME_H_ */

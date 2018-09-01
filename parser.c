@@ -41,15 +41,15 @@ void read()
 	List* undoList = initList();
 	int i = 0;
 	int solved = 0; /*'set' returns 2 if puzzle was solved*/
-	FILE *fp;
 	Board* userBoard;
 	Board* fullBoard;
 
-	const int initialBoardDimension = 3; /* according to the forum  is 3*3 - want to change it to define???*/
+	/*const int initialBoardDimension = 3;  according to the forum  is 3*3 - want to change it to define???, was moved to game.c*/
 
 
 	/* dimensions definition: */
 	boardsize = 9; /*will be changed*/
+	userBoard = init(3,3); /*'userBoard' may be used uninitialized...*/
 
 	printf("Enter your command:\n");
 	if(fgets(input, sizeof input, stdin)!=NULL)
@@ -150,7 +150,8 @@ void read()
 				{
 					/* implement solve*/
 					mode = 1;
-
+					userBoard = doSolve(string[1], undoList);
+					/*
 					fp = fopen(string[1], "r");
 					if (fp==NULL)
 					{
@@ -160,16 +161,21 @@ void read()
 					{
 						userBoard = load(string[1]);
 						boardsize = userBoard->boardsize;
+						destroyList(undoList);
+						undoList = initList();
 						printBoard(userBoard);
 					}
+					*/
+					boardsize = userBoard->boardsize; /*do we need it??/*/
 
 				}
 				else if (strcmp(string[0],"edit")==0) /*available in every mode*/
 				{
 					/* implement edit*/
 					mode = 2; /* start a puzzle in edit mode */
-
-					if (string[1]!=NULL) /*there is a parameter*/
+					userBoard = doEdit(string[1], undoList);
+					/*
+					if (string[1]!=NULL)
 					{
 						fp = fopen(string[1], "r");
 						if (fp==NULL)
@@ -179,20 +185,26 @@ void read()
 						else
 						{
 							userBoard = load(string[1]);
-							userBoard->markErrors = 1;/* mark errors parameter is 1 */
+							userBoard->markErrors = 1;
 							boardsize = userBoard->boardsize;
+							destroyList(undoList);
+							undoList = initList();
 							printBoard(userBoard);
 						}
 
 					}
 					else
 					{
-						/* need to initilalize an empty board */
-						userBoard = init(initialBoardDimension, initialBoardDimension); /* initiate 3*3 */
-						userBoard->markErrors = 1;/* mark errors parameter is 1 */
+						userBoard = init(initialBoardDimension, initialBoardDimension);
+						userBoard->markErrors = 1;
 						boardsize = userBoard->boardsize;
+						destroyList(undoList);
+						undoList = initList();
 						printBoard(userBoard);
 					}
+					*/
+
+					boardsize = userBoard->boardsize;
 				}
 				else if (strcmp(string[0],"mark_errors")==0 && string[1]!=NULL && mode==1) /*available only in solve*/
 				{
@@ -243,28 +255,7 @@ void read()
 				}
 				else if (strcmp(string[0],"save")==0 && string[1]!=NULL && (mode==1 || mode==2)) /*available in solve or edit*/
 				{
-					if (mode==1)
-					{
-						save(userBoard, string[1], mode);
-						printf("Saved to: %s\n", string[1]);
-					}
-					else /*mode==2*/
-					{
-						if(isThereAnError(userBoard))
-							printf("Error:board contains erroneous values\n");
-
-						if(validate(userBoard))
-						{
-							save(userBoard, string[1], mode);
-							printf("Saved to: %s\n", string[1]);
-						}
-						else
-							printf("Error: board validation failed\n");
-						markAsFixed(userBoard); /*implement I - check if this is the acctual need*/
-
-					}
-
-
+					doSave(userBoard, string[1], mode);
 				}
 				else if (strcmp(string[0],"num_solutions")==0 && (mode==1 || mode==2))/*available in solve or edit*/
 				{
