@@ -475,7 +475,7 @@ void doSave(Board* userBoard, char *path, int mode)
 }
 
 
-Board* doSolve(char *path, List* undoList)
+Board* doSolve(char *path, List* undoList,  int currentMarkErrors)
 {
 	Board* userBoard;
 	FILE* fp;
@@ -493,6 +493,7 @@ Board* doSolve(char *path, List* undoList)
 	}
 
 	fclose(fp);
+	userBoard->markErrors = currentMarkErrors;
 	return userBoard;
 
 }

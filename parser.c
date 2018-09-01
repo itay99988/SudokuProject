@@ -148,24 +148,8 @@ void read()
 
 				else if (strcmp(string[0],"solve")==0 && string[1]!=NULL) /*available in every mode*/
 				{
-					/* implement solve*/
 					mode = 1;
-					userBoard = doSolve(string[1], undoList);
-					/*
-					fp = fopen(string[1], "r");
-					if (fp==NULL)
-					{
-						printf("Error: File doesn't exist or cannot be opened\n");
-					}
-					else
-					{
-						userBoard = load(string[1]);
-						boardsize = userBoard->boardsize;
-						destroyList(undoList);
-						undoList = initList();
-						printBoard(userBoard);
-					}
-					*/
+					userBoard = doSolve(string[1], undoList, userBoard->markErrors);
 					boardsize = userBoard->boardsize; /*do we need it??/*/
 
 				}
@@ -174,36 +158,6 @@ void read()
 					/* implement edit*/
 					mode = 2; /* start a puzzle in edit mode */
 					userBoard = doEdit(string[1], undoList);
-					/*
-					if (string[1]!=NULL)
-					{
-						fp = fopen(string[1], "r");
-						if (fp==NULL)
-						{
-							printf("Error: File doesn't exist or cannot be opened\n");
-						}
-						else
-						{
-							userBoard = load(string[1]);
-							userBoard->markErrors = 1;
-							boardsize = userBoard->boardsize;
-							destroyList(undoList);
-							undoList = initList();
-							printBoard(userBoard);
-						}
-
-					}
-					else
-					{
-						userBoard = init(initialBoardDimension, initialBoardDimension);
-						userBoard->markErrors = 1;
-						boardsize = userBoard->boardsize;
-						destroyList(undoList);
-						undoList = initList();
-						printBoard(userBoard);
-					}
-					*/
-
 					boardsize = userBoard->boardsize;
 				}
 				else if (strcmp(string[0],"mark_errors")==0 && string[1]!=NULL && mode==1) /*available only in solve*/
