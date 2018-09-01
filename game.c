@@ -494,10 +494,7 @@ Board* doSolve(char *path, List* undoList)
 
 	fclose(fp);
 	return userBoard;
-	/*
-	if (fp != NULL)
-		free(fp);
-	*/
+
 }
 
 Board* doEdit(char *path, List* undoList)
@@ -520,7 +517,7 @@ Board* doEdit(char *path, List* undoList)
 			undoList = initList();
 			printBoard(userBoard);
 		}
-
+		fclose(fp);
 	}
 	else
 	{
@@ -532,12 +529,7 @@ Board* doEdit(char *path, List* undoList)
 		printBoard(userBoard);
 	}
 
-	fclose(fp);
 	return userBoard;
-	/*
-	if (fp != NULL)
-		free(fp);
-	*/
 }
 
 /*

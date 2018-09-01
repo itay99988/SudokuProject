@@ -78,23 +78,25 @@ void destroyNode(Node* newNode)
 /* clears an entire list from memory */
 void destroyList(List* undoList)
 {
-	if(undoList->head)
-	{
-		/* go to the beginning of the list */
-		while (undoList->head->prev != NULL)
-			{
-				undoList->head = undoList->head->prev;
-			}
+	if(undoList){
+		if(undoList->head)
+		{
+			/* go to the beginning of the list */
+			while (undoList->head->prev != NULL)
+				{
+					undoList->head = undoList->head->prev;
+				}
 
-		/*clear from mem. every node but the first one*/
-		clearBeyond(undoList->head);
+			/*clear from mem. every node but the first one*/
+			clearBeyond(undoList->head);
 
-		/* also clear the first node */
-		destroyNode(undoList->head);
+			/* also clear the first node */
+			destroyNode(undoList->head);
+		}
+
+		/* lastly, clear the list itself */
+		free(undoList);
 	}
-
-	/* lastly, clear the list itself */
-	free(undoList);
 }
 
 

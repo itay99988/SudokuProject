@@ -47,10 +47,6 @@ void save (Board* board, char *path, int gameMode)
 		printf("Saved to: %s\n", path);
 	}
 	fclose(f);
-	/*
-	if (f != NULL)
-		free(f);
-	*/
 
 }
 
@@ -110,9 +106,5 @@ Board* load (char *path)
 	}
 
 	fclose(f);
-	/*
-	if (f != NULL)
-		free(f);
-	*/
 	return board;
 }
