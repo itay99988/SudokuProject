@@ -35,9 +35,7 @@ int isInt(char *string)
                 return 0;
         else
                 return 1;
-
 }
-
 
 
 /*
@@ -157,14 +155,7 @@ void read()
 
 				else if (strcmp(string[0],"validate")==0 && solved!=2 && (mode==1 || mode==2))/*available in solve or edit*/
 					{
-						if(isThereAnError(userBoard))
-							printf("Error: board contains erroneous values\n");
-						else{
-							if(validate(userBoard))
-								printf("Validation passed: board is solvable\n");
-							else
-								printf("Validation failed: board is unsolvable\n");
-						}
+						doValidate(userBoard);
 					}
 
 				else if (strcmp(string[0],"reset")==0 && (mode==1 || mode==2))/*available in solve or edit*/
@@ -238,31 +229,11 @@ void read()
 				}
 				else if (strcmp(string[0],"num_solutions")==0 && (mode==1 || mode==2))/*available in solve or edit*/
 				{
-					int numSolutions;
-					if(isThereAnError(userBoard))
-						printf("Error: board contains erroneous values\n");
-					else
-					{
-						numSolutions=getNumSolutions(userBoard);
-						printf("Number of solutions: %d\n", numSolutions);
-
-
-						if(numSolutions==1)
-							printf("This is a good board!\n");
-						else
-							printf("The puzzle has more than 1 solution, try to edit it further\n");
-					}
-
+					doNumSolutions(userBoard);
 				}
 				else if ((strcmp(string[0],"autofill")==0) && (mode==1)) /*available only in solve*/
 				{
-					if(isThereAnError(userBoard))
-						printf("Error: board contains erroneous values\n");
-					else
-					{
-						autoFill(userBoard,undoList);
-						printBoard(userBoard);
-					}
+					doAutoFill(userBoard, undoList);
 				}
 				else if (strcmp(string[0],"exit")==0) /*available in every mode*/
 				{
