@@ -80,6 +80,7 @@ Board* init(int n, int m){
 		return NULL;
 	}
 	/*fill the new board*/
+	newBoard->markErrors = 1;
 	newBoard->cells = board;
 	newBoard->n = n;
 	newBoard->m = m;
@@ -384,18 +385,23 @@ void undo(Board* board, List* undoList)
 	{
 		if(undoList->head->prev == NULL)
 		{
-			/*do it for each move in this node */
-			movesNum = undoList->head->movesNum;
-			for(i=0;i<movesNum;i++)
+			x=undoList->head->moves[0][0];
+			y=undoList->head->moves[0][1];
+			z=undoList->head->moves[0][2];
+			prevValue = undoList->head->moves[0][3];
+			if(board->cells[x][y].value == z)
+				printf("Error: no moves to undo\n");
+			else
 			{
-				x=undoList->head->moves[i][0];
-				y=undoList->head->moves[i][1];
-				z=undoList->head->moves[i][2];
-				prevValue = undoList->head->moves[i][3];
-				if(board->cells[x][y].value == z)
-					printf("Error: no moves to undo\n");
-				else
+				/*do it for each move in this node */
+				movesNum = undoList->head->movesNum;
+				for(i=0;i<movesNum;i++)
 				{
+					x=undoList->head->moves[i][0];
+					y=undoList->head->moves[i][1];
+					z=undoList->head->moves[i][2];
+					prevValue = undoList->head->moves[i][3];
+
 					board->cells[x][y].value = z;
 					prevChar = digitToChar(prevValue);
 					zChar = digitToChar(z);
@@ -409,9 +415,9 @@ void undo(Board* board, List* undoList)
 			movesNum = undoList->head->movesNum;
 			for(i=0;i<movesNum;i++)
 			{
-				x=undoList->head->moves[0][0];
-				y=undoList->head->moves[0][1];
-				z=undoList->head->moves[0][2];
+				x=undoList->head->moves[i][0];
+				y=undoList->head->moves[i][1];
+				z=undoList->head->moves[i][2];
 				prevValue = undoList->head->moves[i][3];
 				board->cells[x][y].value = z;
 				prevChar = digitToChar(prevValue);
