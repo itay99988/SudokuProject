@@ -555,6 +555,45 @@ int validate(Board* board){
 	return result;
 }
 
+void doValidate(Board* userBoard)
+{
+	if(isThereAnError(userBoard))
+		printf("Error: board contains erroneous values\n");
+	else{
+		if(validate(userBoard))
+			printf("Validation passed: board is solvable\n");
+		else
+			printf("Validation failed: board is unsolvable\n");
+	}
+}
+
+void doNumSolutions(Board* userBoard){
+
+	int numSolutions;
+	if(isThereAnError(userBoard))
+		printf("Error: board contains erroneous values\n");
+	else
+	{
+		numSolutions=getNumSolutions(userBoard);
+		printf("Number of solutions: %d\n", numSolutions);
+
+
+		if(numSolutions==1)
+			printf("This is a good board!\n");
+		else
+			printf("The puzzle has more than 1 solution, try to edit it further\n");
+	}
+}
+
+void doAutoFill(Board* userBoard, List* undoList){
+	if(isThereAnError(userBoard))
+		printf("Error: board contains erroneous values\n");
+	else
+	{
+		autoFill(userBoard,undoList);
+		printBoard(userBoard);
+	}
+}
 
 /*
  * startGame

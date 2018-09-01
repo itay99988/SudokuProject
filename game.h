@@ -48,6 +48,9 @@ void exitGame(Board *userBoard, List* undoList);
 void doSave(Board* board, char *path, int gameMode);
 Board* doSolve(char *path, List* undoList, int mode, int currentMarkErrors);
 Board* doEdit(char *path, List* undoList, int mode);
+void doValidate(Board* board);
+void doNumSolutions(Board* board);
+void doAutoFill(Board* board, List* undoList);
 int validate(Board* board);
 void startGame();
 #endif /* GAME_H_ */
