@@ -32,8 +32,8 @@ void read()
 	 * 2 - Edit
 	 */
 	int mode = 0; /*starts in Init mode*/
-	char input[1024]; /*maybe 256?*/
-	char *string[1024];
+	char input[256];
+	char *string[256];
 
 	char delimiters[] = " \t\r\n";
 	int x,y,z;
@@ -80,6 +80,8 @@ void read()
 					y = atoi(string[2]);
 					z = atoi(string[3]);
 
+					boardsize = userBoard->boardsize; /*do we need it??/*/
+
 					if((x==0 && strcmp(string[1],"0")!=0)||(y==0 && strcmp(string[2],"0")!=0)||(z==0 && strcmp(string[3],"0")!=0))
 							printf("Error: value not in range 0-%d\n",boardsize);
 					else if (!((x>=1 && x<=boardsize) && (y>=1 && y<=boardsize) && (z>=0 && z<=boardsize)))
@@ -99,6 +101,7 @@ void read()
 					{/*need to update according to new rules*/
 						x = atoi(string[1]);
 						y = atoi(string[2]);
+						boardsize = userBoard->boardsize; /*do we need it??/*/
 
 						if((x==0 && strcmp(string[1],"0")!=0)||(y==0 && strcmp(string[2],"0")!=0))
 								printf("Error: value not in range 1-%d\n",boardsize);
@@ -149,16 +152,13 @@ void read()
 				else if (strcmp(string[0],"solve")==0 && string[1]!=NULL) /*available in every mode*/
 				{
 					mode = 1;
-					userBoard = doSolve(string[1], undoList, userBoard->markErrors);
-					boardsize = userBoard->boardsize; /*do we need it??/*/
-
+					userBoard = doSolve(string[1], undoList,mode, userBoard->markErrors);
 				}
 				else if (strcmp(string[0],"edit")==0) /*available in every mode*/
 				{
 					/* implement edit*/
 					mode = 2; /* start a puzzle in edit mode */
-					userBoard = doEdit(string[1], undoList);
-					boardsize = userBoard->boardsize;
+					userBoard = doEdit(string[1], undoList, mode);
 				}
 				else if (strcmp(string[0],"mark_errors")==0 && string[1]!=NULL && mode==1) /*available only in solve*/
 				{
@@ -181,6 +181,7 @@ void read()
 					x = atoi(string[1]);
 					y = atoi(string[2]);
 					/* need to update empty cells according to d */
+					boardsize = userBoard->boardsize; /*do we need it??/*/
 
 					/* need to check - d!!! */
 					if((x==0 && strcmp(string[1],"0")!=0)||(y==0 && strcmp(string[2],"0")!=0))

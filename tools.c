@@ -50,7 +50,7 @@ void save (Board* board, char *path, int gameMode)
 
 }
 
-Board* load (char *path)
+Board* load (char *path, int mode)
 {
 	int size, i, j, m, n;
 	Board *board;
@@ -93,7 +93,10 @@ Board* load (char *path)
 		    		/*printf("%s ",data);*/
 		    		if (data[strlen(data)-1] == '.')
 		    		{
-		    			board->cells[i][j].fixed = 1;
+		    			if(mode==1)
+		    				board->cells[i][j].fixed = 1;
+		    			else /*mode==2*/
+		    				board->cells[i][j].fixed = 0;
 		    			data[strlen(data)-1] = '\0';
 		    		}
 

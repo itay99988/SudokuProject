@@ -475,7 +475,7 @@ void doSave(Board* userBoard, char *path, int mode)
 }
 
 
-Board* doSolve(char *path, List* undoList,  int currentMarkErrors)
+Board* doSolve(char *path, List* undoList,int mode, int currentMarkErrors)
 {
 	Board* userBoard;
 	FILE* fp;
@@ -486,19 +486,19 @@ Board* doSolve(char *path, List* undoList,  int currentMarkErrors)
 	}
 	else
 	{
-		userBoard = load(path);
+		userBoard = load(path, mode);
 		destroyList(undoList);
 		undoList = initList();
+		userBoard->markErrors = currentMarkErrors;
 		printBoard(userBoard);
 	}
 
 	fclose(fp);
-	userBoard->markErrors = currentMarkErrors;
 	return userBoard;
 
 }
 
-Board* doEdit(char *path, List* undoList)
+Board* doEdit(char *path, List* undoList, int mode)
 {
 	FILE* fp;
 	Board* userBoard;
@@ -512,7 +512,7 @@ Board* doEdit(char *path, List* undoList)
 		}
 		else
 		{
-			userBoard = load(path);
+			userBoard = load(path,mode);
 			userBoard->markErrors = 1;/* mark errors parameter is 1 */
 			destroyList(undoList);
 			undoList = initList();
