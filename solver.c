@@ -458,3 +458,42 @@ int isThereAnError(Board *board){
 
 	return 0;
 }
+
+void markAllBoardErrors(Board* board){
+    int row,column;
+    int n,m,boardsize;
+    int modifiedRow, modifiedColumn;
+    int value;
+
+    modifiedRow = 0; /*just for initialization*/
+    modifiedColumn = 0; /*just for initialization*/
+    n=modifiedRow*modifiedColumn; /*just for using the variables*/
+
+    /* dimensions definition: */
+	n=board->n;
+	m=board->m;
+	boardsize=board->boardsize;
+
+	for(row=0;row<boardsize;row++)
+		for(column=0;column<boardsize;column++)
+		{
+			if(!board->cells[row][column].fixed)
+			{
+				modifiedRow = (row/m)*m;
+				modifiedColumn = (column/n)*n;
+				value = board->cells[row][column].value;
+				board->cells[row][column].value = 0;
+				if (value!=0)
+				{
+					board->cells[row][column].error = !isValid(board,row,column,value);
+					/*
+					if(board->cells[row][column].error==1)
+						board->cells[row][column].fixed = 0;
+					*/
+				}
+
+				board->cells[row][column].value = value;
+			}
+
+		}
+}

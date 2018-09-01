@@ -8,6 +8,7 @@ int randBacktracking(Board* board);
 void autoFill(Board *board,List *undoList);
 int countDetBacktracking(Board* board);
 int getNumSolutions(Board* board);
-void markErrors(Board *board, int row, int column);
+void markErrors(Board* board, int row, int column);
+void markAllBoardErrors(Board* board);
 int isThereAnError(Board *board);
 #endif /* SOLVER_H_ */

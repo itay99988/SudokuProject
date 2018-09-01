@@ -105,6 +105,7 @@ Board* load (char *path)
 	    }
 	}
 
+	markAllBoardErrors(board);
 	fclose(f);
 	return board;
 }
