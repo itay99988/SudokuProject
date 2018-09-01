@@ -36,7 +36,7 @@ void save (Board* board, char *path, int gameMode)
 			for(j=0;j<size;j++)
 			{
 				fprintf(f,"%d",board->cells[i][j].value);
-				if (board->cells[i][j].fixed==1 || (gameMode==2 && board->cells[i][j].value!=0))
+				if (board->cells[i][j].fixed==1 || (gameMode==2 && board->cells[i][j].value!=0)) /*this is how we implement h*/
 					fprintf(f,".");
 				else
 					fprintf(f," ");
@@ -44,8 +44,14 @@ void save (Board* board, char *path, int gameMode)
 			}
 			fprintf(f,"\n");
 		}
+		printf("Saved to: %s\n", path);
 	}
 	fclose(f);
+	/*
+	if (f != NULL)
+		free(f);
+	*/
+
 }
 
 Board* load (char *path)
@@ -68,6 +74,7 @@ Board* load (char *path)
 	}
 	else
 	{
+
 		if(fgets(line, sizeof line, f) != NULL)
 		{
 			/*printf("first line is '%s'\n",line);*/
@@ -101,7 +108,11 @@ Board* load (char *path)
 			}
 	    }
 	}
-	fclose(f);
 
+	fclose(f);
+	/*
+	if (f != NULL)
+		free(f);
+	*/
 	return board;
 }
