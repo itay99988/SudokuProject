@@ -74,8 +74,8 @@ Board* load (char *path, int mode)
 		if(fgets(line, sizeof line, f) != NULL)
 		{
 			/*printf("first line is '%s'\n",line);*/
-			m = atoi(strtok(line,delimiters));
-			n = atoi(strtok(line,delimiters));
+			m = (strtok(line,delimiters))[0] - '0';
+			n = (strtok(line,delimiters))[2] - '0';
 			size = m*n;
 			board = init(n,m);
 		}
