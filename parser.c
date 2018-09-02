@@ -167,13 +167,13 @@ void read()
 				else if (strcmp(string[0],"solve")==0 && string[1]!=NULL) /*available in every mode*/
 				{
 					mode = 1;
-					userBoard = doSolve(string[1], undoList,mode, userBoard->markErrors);
+					doSolve(string[1], &userBoard, &undoList, mode, userBoard->markErrors);
 				}
 				else if (strcmp(string[0],"edit")==0) /*available in every mode*/
 				{
 					/* implement edit*/
 					mode = 2; /* start a puzzle in edit mode */
-					userBoard = doEdit(string[1], undoList, mode);
+					doEdit(string[1],&userBoard, &undoList, mode);
 				}
 				else if (strcmp(string[0],"mark_errors")==0 && string[1]!=NULL && mode==1) /*available only in solve*/
 				{
@@ -187,7 +187,6 @@ void read()
 				}
 				else if (strcmp(string[0],"print_board")==0 && (mode==1 || mode==2)) /*available in solve or edit*/
 				{
-					/* implement printBoard*/
 					printBoard(userBoard);
 				}
 				else if (strcmp(string[0],"generate")==0 && string[1]!=NULL && isInt(string[1]) && string[2]!=NULL && isInt(string[2]) && mode==2) /*available only in edit*/

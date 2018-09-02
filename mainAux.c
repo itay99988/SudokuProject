@@ -141,27 +141,26 @@ void resetOption(int *options, int size)
 void destroyBoard(Board *currentBoard)
 {
 	int k,l,size;
-
-	size = currentBoard->boardsize;
-	for(k=0;k<size;k++)
-	{
-		for(l=0;l<size;l++)
+	if(currentBoard){
+		size = currentBoard->boardsize;
+		for(k=0;k<size;k++)
 		{
-			if(currentBoard->cells[k][l].options){
-				free(currentBoard->cells[k][l].options);
-				currentBoard->cells[k][l].options = NULL;
+			for(l=0;l<size;l++)
+			{
+				if(currentBoard->cells[k][l].options){
+					free(currentBoard->cells[k][l].options);
+					currentBoard->cells[k][l].options = NULL;
+				}
+			}
+			if(currentBoard->cells[k])
+			{
+				free(currentBoard->cells[k]);
 			}
 		}
-		if(currentBoard->cells[k])
-		{
-			free(currentBoard->cells[k]);
-		}
-	}
-
-	if(currentBoard->cells)
-		free(currentBoard->cells);
-	if(currentBoard)
+		if(currentBoard->cells)
+			free(currentBoard->cells);
 		free(currentBoard);
+	}
 }
 /*
  * copyBoard

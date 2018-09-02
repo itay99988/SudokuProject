@@ -143,7 +143,6 @@ void printBoard(Board *board)
 
 	/*definitions of dimentions: */
 	n=board->n, m=board->m, N=board->boardsize;
-
 	for (i=0; i<N; i++)
 	{
 		if (i%m==0)
@@ -179,7 +178,6 @@ void printBoard(Board *board)
 		printf("|\n");
 
 	}
-
     for (k = 0; k < 4*N + m +1; k++)
 	    printf("-");
 	printf("\n");
@@ -481,9 +479,8 @@ void doSave(Board* userBoard, char *path, int mode)
 }
 
 
-Board* doSolve(char *path, List* undoList,int mode, int currentMarkErrors)
+void doSolve(char *path, Board** userBoard, List** undoList,int mode, int currentMarkErrors)
 {
-	Board* userBoard;
 	FILE* fp;
 	fp = fopen(path, "r");
 	if (fp==NULL)
@@ -492,23 +489,20 @@ Board* doSolve(char *path, List* undoList,int mode, int currentMarkErrors)
 	}
 	else
 	{
-		userBoard = load(path, mode);
-		destroyList(undoList);
-		undoList = initList();
-		userBoard->markErrors = currentMarkErrors;
-		printBoard(userBoard);
+		load(path,userBoard,mode);
+		destroyList(*undoList);
+		(*undoList) = initList();
+		(*userBoard)->markErrors = currentMarkErrors;
+		printBoard(*userBoard);
 	}
 
 	fclose(fp);
-	return userBoard;
 
 }
 
-Board* doEdit(char *path, List* undoList, int mode)
+void doEdit(char *path,Board** userBoard, List** undoList, int mode)
 {
 	FILE* fp;
-	Board* userBoard;
-
 	if (path!=NULL) /*there is a parameter*/
 	{
 		fp = fopen(path, "r");
@@ -518,25 +512,27 @@ Board* doEdit(char *path, List* undoList, int mode)
 		}
 		else
 		{
-			userBoard = load(path,mode);
-			userBoard->markErrors = 1;/* mark errors parameter is 1 */
-			destroyList(undoList);
-			undoList = initList();
-			printBoard(userBoard);
+			destroyBoard(*userBoard);
+			load(path,userBoard,mode);
+
+			(*userBoard)->markErrors = 1;/* mark errors parameter is 1 */
+			destroyList(*undoList);
+			*undoList = initList();
+			printBoard(*userBoard);
 		}
 		fclose(fp);
 	}
 	else
 	{
+		destroyBoard(*userBoard);
 		/* need to initilalize an empty board */
-		userBoard = init(3, 3); /* initiate 3*3 - maybe change it to a DEFINE or something */
-		userBoard->markErrors = 1;/* mark errors parameter is 1 */
-		destroyList(undoList);
-		undoList = initList();
-		printBoard(userBoard);
+		*userBoard = init(3, 3); /* initiate 3*3 - maybe change it to a DEFINE or something */
+		(*userBoard)->markErrors = 1;/* mark errors parameter is 1 */
+		destroyList(*undoList);
+		*undoList = initList();
+		printBoard(*userBoard);
 	}
 
-	return userBoard;
 }
 
 /*

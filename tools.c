@@ -14,7 +14,7 @@
 #include "parser.h"
 
 
-void save (Board* board, char *path, int gameMode)
+int save (Board* board, char *path, int gameMode)
 {
 	int i, j;
 	int n,m,size;
@@ -27,6 +27,7 @@ void save (Board* board, char *path, int gameMode)
 	{
 		/* printf("Error opening file!\n"); what should we do???*/
 		printf("Error: File cannot be created or modified\n");
+		return 0;
 	}
 	else
 	{
@@ -47,13 +48,13 @@ void save (Board* board, char *path, int gameMode)
 		printf("Saved to: %s\n", path);
 	}
 	fclose(f);
+	return 1;
 
 }
 
-Board* load (char *path, int mode)
+int load (char *path, Board** board, int mode)
 {
 	int size, i, j, m, n;
-	Board *board;
 	FILE *f = fopen(path, "r");
     char line[1024];
     char * data;
@@ -62,22 +63,20 @@ Board* load (char *path, int mode)
 
     i = 0;
     j = 0;
-    /*printf("------------------\n");*/
 
 	if (f == NULL)
 	{
-	    printf("Error opening file!\n"); /*what should we do???*/
+	    printf("Error opening file!\n");
+	    return 0;
 	}
 	else
 	{
-
 		if(fgets(line, sizeof line, f) != NULL)
 		{
-			/*printf("first line is '%s'\n",line);*/
 			m = (strtok(line,delimiters))[0] - '0';
 			n = (strtok(line,delimiters))[2] - '0';
 			size = m*n;
-			board = init(n,m);
+			*board = init(n,m);
 		}
 
 		for (i=0; i<size;i++)
@@ -94,21 +93,23 @@ Board* load (char *path, int mode)
 		    		if (data[strlen(data)-1] == '.')
 		    		{
 		    			if(mode==1)
-		    				board->cells[i][j].fixed = 1;
+		    				(*board)->cells[i][j].fixed = 1;
 		    			else /*mode==2*/
-		    				board->cells[i][j].fixed = 0;
+		    				(*board)->cells[i][j].fixed = 0;
 		    			data[strlen(data)-1] = '\0';
 		    		}
 
-		    		board->cells[i][j].value = atoi(data);
+		    		(*board)->cells[i][j].value = atoi(data);
 		    		/*printf("\n");*/
 		    		data = strtok(NULL,delimiters);
 		    	}
 			}
 	    }
+
+		markAllBoardErrors(*board);
+		fclose(f);
+		return 1;
 	}
 
-	markAllBoardErrors(board);
-	fclose(f);
-	return board;
+
 }

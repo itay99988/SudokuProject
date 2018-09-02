@@ -1,7 +1,7 @@
 #ifndef TOOLS_H_
 #define TOOLS_H_
 
-void save (Board* board, char *path, int mode);
-Board* load (char *path, int mode);
+int save (Board* board, char *path, int gameMode);
+int load (char *path, Board** board, int mode);
 
 #endif /* TOOLS_H_ */
