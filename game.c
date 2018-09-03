@@ -90,43 +90,6 @@ Board* init(int n, int m){
 }
 
 /*
- * initUserBoard
- *
- *  This function gets an already created board an turns some of the cell in it to fixed,
- *  and deletes everything else.
- *  @param userBoard - the solved board
- *  @param fixedCells - desired amount of fixed cells
- *  @return -
- */
-void initUserBoard(Board* userBoard, int fixedCells)
-{
-	int randRow, randColumn;
-	int i, j, size;
-
-	size = userBoard->boardsize;
-	while(fixedCells>0)
-	{
-		randColumn = rand()%size;
-		randRow = rand()%size;
-
-		if(userBoard->cells[randRow][randColumn].fixed==0)
-		{
-			userBoard->cells[randRow][randColumn].fixed=1;
-			fixedCells--;
-		}
-
-	}
-
-	for(i=0;i<size;i++)
-		for(j=0;j<size;j++)
-			if(userBoard->cells[i][j].fixed==0)
-			{
-				userBoard->cells[i][j].value=0;
-				/*maybe need to init options*/
-			}
-
-}
-/*
  * printBoard
  *
  *  This function prints the current status of the sudoku board, according to the desired format

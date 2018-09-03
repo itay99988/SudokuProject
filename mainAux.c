@@ -226,40 +226,6 @@ Board* copyBoard(Board *currentBoard)
 }
 
 /*
- * copyIntoBoard
- *
- *  This function completely copies some board to an existing location in memory
- *  @param fromBoard - pointer to copied board
- *  @param toBoard - pointer to new board
- *  @param size - size of board
- *  @return -
- */
-void copyIntoBoard(Board *fromBoard, Board *toBoard)
-{
-	int k,l,size;
-
-	size = fromBoard->boardsize;
-
-	/* copy the basic props first */
-	toBoard->boardsize = size;
-	toBoard->n = fromBoard->n;
-	toBoard->m = fromBoard->m;
-
-	/* now copy the actual cells */
-	for(k=0;k<size;k++)
-	{
-		for(l=0;l<size;l++)
-		{
-			toBoard->cells[k][l].value = fromBoard->cells[k][l].value;
-			toBoard->cells[k][l].fixed = fromBoard->cells[k][l].fixed;
-			toBoard->cells[k][l].error = fromBoard->cells[k][l].error;
-			copyIntoOption(fromBoard->cells[k][l].options,toBoard->cells[k][l].options,size);
-			toBoard->cells[k][l].numOfOptions = fromBoard->cells[k][l].numOfOptions;
-		}
-	}
-}
-
-/*
  * resetBoard
  *
  *  This function resets all values of a exisiting board to its default values.
@@ -267,6 +233,8 @@ void copyIntoBoard(Board *fromBoard, Board *toBoard)
  *  @param size - size of board
  *  @return -
  */
+
+/*right now this is unused - maybe we'll use this later */
 void resetBoard(Board *board)
 {
 	int k,l,size;

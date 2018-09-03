@@ -56,134 +56,6 @@ int isValid(Board *board, int row, int column, int value)
     return 1;
 }
 
-
-/*
- * isBoardValid
- *
- *  This function check if the all the cells are filled - because the board is finished iff all the cells
- *  were filled.
- *  @param board - the game board
- *  @return - 1 if board is valid, 0 otherwise
- */
-int isBoardValid(Board *board)
-{
-    int i,j,N;
-
-    N=board->boardsize;
-    for (i=0;i<N; i++)
-    {
-    	for (j=0;j<N; j++)
-		{
-			if(board->cells[i][j].fixed==0 && board->cells[i][j].value==0)
-				return 0;
-		}
-    }
-
-    return 1;
-}
-
-/*
- * detBacktracking
- *
- *  This function solves the board by deterministic backtracking
- *  @param board - the game board
- *  @return -1 if succeeded, 0 if it's not possible
- */
-int detBacktracking(Board* board)
-{
-	int i,j,k;
-	int size;
-
-	/* dimensions definition: */
-	size=board->boardsize;
-
-	for(i=0;i<size;i++)
-	{
-		for(j=0;j<size;j++)
-		{
-			if(board->cells[i][j].fixed==0 && board->cells[i][j].value==0)
-			{
-				for (k=1;k<=size;k++)
-				{
-					if (isValid(board,i, j, k)==1)
-					{
-						board->cells[i][j].value = k;
-
-						if (detBacktracking(board))
-							return 1;
-					}
-				}
-
-				/*
-				if (k==10 && board[i][j].value!=9)
-				{
-					board[i][j].value=0;
-					return 0;
-				}
-				*/
-				board->cells[i][j].value=0;
-				return 0;
-			}
-
-		}
-	}
-
-	return 1;
-}
-
-/*
- * randBacktracking
- *
- *  This function solves the board by randomized backtracking
- *  @param size - board's size
- *  @param board - the game board
- *  @return -1 if succeeded, 0 if it's not possible
- */
-int randBacktracking(Board* board)
-{
-	int i,j,k;
-	int size;
-	int randomIndex;
-	int originalNumOfOptions;
-
-	/* dimensions definition: */
-	size=board->boardsize;
-
-	for(i=0;i<size;i++)
-	{
-		for(j=0;j<size;j++)
-		{
-			if(board->cells[i][j].fixed==0 && board->cells[i][j].value==0)
-			{
-				setOptions(board,i,j);
-				originalNumOfOptions = board->cells[i][j].numOfOptions;
-				for (k=0; k<originalNumOfOptions;k++)
-				{
-					if (board->cells[i][j].numOfOptions==1)
-						randomIndex = 0;
-					else
-						randomIndex = rand()%board->cells[i][j].numOfOptions;
-
-					board->cells[i][j].value = board->cells[i][j].options[randomIndex];
-
-					if (randBacktracking(board))
-						return 1;
-
-
-					board->cells[i][j].numOfOptions--;
-					removeOption(board->cells[i][j].options,randomIndex,size);
-				}
-
-				board->cells[i][j].value=0;
-				return 0;
-
-			}
-		}
-	}
-
-	return 1;
-}
-
 void autoFill(Board *board,List *undoList)
 {
 	int i,j;
@@ -261,6 +133,7 @@ void autoFill(Board *board,List *undoList)
 	destroyStack(stack);
 }
 
+/* this function will we erased as soon as we finish our test on num solutions */
 int countDetBacktracking(Board* board)
 {
 	int i,j,k;

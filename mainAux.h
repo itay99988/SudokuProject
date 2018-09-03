@@ -9,7 +9,6 @@ void copyIntoOption(int *fromOptions, int *toOptions, int size);
 void resetOption(int *options, int size);
 void destroyBoard(Board *currentBoard);
 Board* copyBoard(Board *currentBoard);
-void copyIntoBoard(Board *fromBoard, Board *toBoard);
 void resetBoard(Board *board);
 void printArray(int *arr, int size);
 void markAsFixed(Board *currentBoard);
