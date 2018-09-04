@@ -198,20 +198,12 @@ void read()
 					boardsize = userBoard->boardsize; /*do we need it??/*/
 
 					/* need to check - d!!! */
-					if((x==0 && strcmp(string[1],"0")!=0)||(y==0 && strcmp(string[2],"0")!=0))
-							printf("Error: value not in range 0-%d\n",boardsize*boardsize); /*maybe need to change boardsize*/
-					else if ((x>=0 && x<=boardsize*boardsize) && (y>=0 && y<=boardsize*boardsize) && (z>=0 && z<=boardsize*boardsize)) /*maybe need to change boardsize*/
+					if (!((x>=0 && x<=boardsize*boardsize) && (y>=0 && y<=boardsize*boardsize))) /*maybe need to change boardsize*/
 						printf("Error: value not in range 0-%d\n",boardsize*boardsize); /*fixxxxx this!!!! */
 					/* ------------------ */
 					else
 					{
-						/*check if the board is empty*/
-						if(1)
-						{
-							/* implement e-h */
-						}
-						else
-							printf("Error: board is not empty\n");
+						doGenerate(userBoard, undoList, x, y);
 					}
 				}
 				else if (strcmp(string[0],"undo")==0 && (mode==1 || mode==2)) /*available in solve or edit*/
@@ -274,6 +266,5 @@ void read()
 
 	  /*NEED TO EXIT*/
 	  exitGame(userBoard, undoList);
-
 }
 

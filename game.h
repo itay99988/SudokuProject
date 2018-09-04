@@ -42,14 +42,16 @@ int set(Board *board, List *undoList, int x, int y, int z, int gameMode);
 void hint(Board *solvedBoard, int x, int y);
 void redo(Board* board, List* undoList, int printVal);
 void undo(Board* board, List* undoList, int printVal);
+int generate(Board* userBoard, List *undoList, int x, int y);
 void reset(Board* board, List** undoList);
 void exitGame(Board *userBoard, List* undoList);
+int validate(Board* board);
 void doSave(Board* board, char *path, int gameMode);
 void doSolve(char *path, Board** userBoard, List** undoList,int mode, int currentMarkErrors);
 void doEdit(char *path,Board** userBoard, List** undoList, int mode);
 void doValidate(Board* board);
 void doNumSolutions(Board* board);
 void doAutoFill(Board* board, List* undoList);
-int validate(Board* board);
+void doGenerate(Board* userBoard, List* undoList, int x, int y);
 void startGame();
 #endif /* GAME_H_ */

@@ -26,7 +26,6 @@
  *  @return -
  */
 Board* init(int n, int m){
-
 	Cell **board;
 	int i;
 	int k,l;
@@ -215,7 +214,6 @@ int set(Board *board, List *undoList, int x, int y, int z, int gameMode)
 
 
 	return 1;
-
 }
 /*
  * hint
@@ -291,6 +289,107 @@ void undo(Board* board, List* undoList, int printVal)
 		}
 		undoList->current = undoList->current->prev;
 	}
+}
+
+/* assuming the board is empty, we are in edit mode, and x,y are valid integers */
+int generate(Board* userBoard, List *undoList, int x, int y){
+	int i,j,l,N,randRow,randCol, chosenValue;
+	int pickedXCells=1, isBoardSolvable=1, filledSuccessfully = 0, randIndex=0, changesCount=0;
+	int* oneMove;
+	int** moves;
+	Node* newNode;
+
+	N=userBoard->boardsize;
+	if(y==0)
+		return 1;
+
+	for(i=0;i<1000;i++){
+		for(j=0;j<x;j++){
+			randRow = rand()%N;
+			randCol = rand()%N;
+			if(userBoard->cells[randRow][randCol].value!=0){
+				j--;
+				continue;
+			}
+			setOptions(userBoard,randRow,randCol);
+			printArray(userBoard->cells[randRow][randCol].options,userBoard->cells[randRow][randCol].numOfOptions);
+			if(userBoard->cells[randRow][randCol].numOfOptions==0){
+				pickedXCells = 0;
+				break;
+			}
+			randIndex = rand()%userBoard->cells[randRow][randCol].numOfOptions;
+			chosenValue = userBoard->cells[randRow][randCol].options[randIndex];
+			userBoard->cells[randRow][randCol].value = chosenValue;
+		}
+
+		if(!pickedXCells){
+			resetBoard(userBoard);
+			pickedXCells=1;
+			continue;
+		}
+
+		isBoardSolvable = ilpSolve(userBoard);
+		if(!isBoardSolvable){
+			resetBoard(userBoard);
+			isBoardSolvable=1;
+			continue;
+		}
+		else{
+			filledSuccessfully=1;
+			break;
+		}
+	}
+	if(!filledSuccessfully)
+		return 0;
+
+	for(l=1;l<=(N*N - y);l++){
+		randRow = rand()%N;
+		randCol = rand()%N;
+		if(userBoard->cells[randRow][randCol].value==0){
+			l--;
+			continue;
+		}
+		userBoard->cells[randRow][randCol].value = 0;
+	}
+
+	moves = malloc(y*sizeof(int*));
+	if(!moves){
+		printf("Error: malloc has failed\n");
+		exit(0);
+		return 0;
+	}
+	for(i=0;i<N;i++){
+		for(j=0;j<N;j++){
+			if(userBoard->cells[i][j].value!=0){
+				oneMove = malloc(4*sizeof(int));
+				if(!oneMove){
+					printf("Error: malloc has failed\n");
+					exit(0);
+					return 0;
+				}
+				oneMove[0]=i; oneMove[1]=j; oneMove[2]=0; oneMove[3]=userBoard->cells[i][j].value;
+				moves[changesCount] = oneMove;
+				changesCount++;
+			}
+		}
+	}
+
+	/*node preparation*/
+	newNode = malloc(sizeof(Node));
+	if(!newNode){
+		printf("Error: malloc has failed\n");
+		exit(0);
+		return 0;
+	}
+	newNode->moves = moves;
+	newNode->movesNum = y;
+	newNode->next = NULL;
+	newNode->prev = NULL;
+	/* adding the new node to the list */
+	addMove(undoList,newNode);
+	/* end of node preparation */
+
+	return 1;
 }
 
 void reset(Board* board, List** undoList){
@@ -394,7 +493,6 @@ void doEdit(char *path,Board** userBoard, List** undoList, int mode)
 		*undoList = initList();
 		printBoard(*userBoard);
 	}
-
 }
 
 /*
@@ -450,6 +548,20 @@ void doAutoFill(Board* userBoard, List* undoList){
 	{
 		autoFill(userBoard,undoList);
 		printBoard(userBoard);
+	}
+}
+
+void doGenerate(Board* userBoard, List* undoList, int x, int y){
+	int result;
+
+	if(!isBoardEmpty(userBoard))
+		printf("Error: board is not empty\n");
+	else{
+		result = generate(userBoard, undoList, x, y);
+		if(!result)
+			printf("Error: puzzle generator failed\n");
+		else
+			printBoard(userBoard);
 	}
 }
 

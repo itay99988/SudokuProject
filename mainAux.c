@@ -234,7 +234,7 @@ Board* copyBoard(Board *currentBoard)
  *  @return -
  */
 
-/*right now this is unused - maybe we'll use this later */
+
 void resetBoard(Board *board)
 {
 	int k,l,size;
@@ -299,6 +299,19 @@ int isBoardFull(Board *currentBoard)
 	for (i =0; i<size; i++)
 		for (j =0; j<size; j++)
 			if(currentBoard->cells[i][j].value==0)
+				return 0;
+
+	return 1;
+}
+
+int isBoardEmpty(Board *currentBoard)
+{
+	int i, j;
+	int size = currentBoard->boardsize;
+
+	for (i =0; i<size; i++)
+		for (j =0; j<size; j++)
+			if(currentBoard->cells[i][j].value!=0)
 				return 0;
 
 	return 1;

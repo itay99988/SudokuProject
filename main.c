@@ -13,7 +13,7 @@
 #include <time.h>
 #include "game.h"
 
-int main(int argc, char *argv[]){
+int main(){
 	SP_BUFF_SET();
 	srand(time(NULL));
 

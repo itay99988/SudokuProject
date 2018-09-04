@@ -74,7 +74,10 @@ void autoFill(Board *board,List *undoList)
 	/*stack*/
 	stack = initStack();
 	poppedNode = (StackNode*)malloc(sizeof(StackNode));
-
+	if(!poppedNode){
+			printf("Error: malloc has failed\n");
+			exit(0);
+		}
 	for (i=0;i<N; i++)
 	{
 		for (j=0; j<N; j++)
@@ -104,6 +107,10 @@ void autoFill(Board *board,List *undoList)
 
 	movesNum=stack->length;
 	moves = malloc(movesNum*sizeof(int*));
+	if(!moves){
+			printf("Error: malloc has failed\n");
+			exit(0);
+		}
 	while(!isEmpty(stack))
 	{
 		pop(stack,poppedNode);
@@ -111,6 +118,10 @@ void autoFill(Board *board,List *undoList)
 		board->cells[poppedNode->column][poppedNode->row].value = poppedNode->value;
 		markErrors(board,poppedNode->column,poppedNode->row);
 		oneMove = malloc(4*sizeof(int));
+		if(!oneMove){
+			printf("Error: malloc has failed\n");
+			exit(0);
+		}
 		oneMove[0]=poppedNode->column,oneMove[1]=poppedNode->row,oneMove[2]=prevValue,oneMove[3]=poppedNode->value;
 		moves[stack->length] = oneMove;
 	}
@@ -119,6 +130,10 @@ void autoFill(Board *board,List *undoList)
 	{
 		/*node preparation*/
 		newNode = malloc(sizeof(Node));
+		if(!newNode){
+			printf("Error: malloc has failed\n");
+			exit(0);
+		}
 		newNode->moves = moves;
 		newNode->movesNum = movesNum;
 		newNode->next = NULL;

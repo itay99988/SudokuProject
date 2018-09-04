@@ -110,6 +110,4 @@ int load (char *path, Board** board, int mode)
 		fclose(f);
 		return 1;
 	}
-
-
 }
