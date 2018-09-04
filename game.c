@@ -240,166 +240,65 @@ static char digitToChar(int c)
 		return c + '0';
 }
 
-void redo(Board* board, List* undoList)
+void redo(Board* board, List* undoList, int printVal)
 {
 	int x,y,z,prevValue,movesNum,i;
 	char prevChar,zChar;
-	if(undoList->head == NULL)
-	{
-		printf("Error: no moves to redo\n");
+	if(undoList->current->next == NULL){
+		if(printVal)
+			printf("Error: no moves to redo\n");
 	}
-	else
-	{
-		if(undoList->head->next == NULL && undoList->head->prev == NULL)
-		{
-			movesNum = undoList->head->movesNum;
-			x=undoList->head->moves[0][0];
-			y=undoList->head->moves[0][1];
-			prevValue = undoList->head->moves[0][2];
-			z=undoList->head->moves[0][3];
-
-			if(board->cells[x][y].value != prevValue)
-			{
-				printf("Error: no moves to redo\n");
-			}
-			else
-			{
-				for(i=0;i<movesNum;i++)
-				{
-					x=undoList->head->moves[i][0];
-					y=undoList->head->moves[i][1];
-					prevValue = undoList->head->moves[i][2];
-					z=undoList->head->moves[i][3];
-					board->cells[x][y].value = z;
-					prevChar = digitToChar(prevValue);
-					zChar = digitToChar(z);
-					markErrors(board, x, y);
-					printf("Redo %d,%d: from %c to %c\n",y+1,x+1,prevChar,zChar);
-				}
-			}
-		}
-		else
-		{
-			if(undoList->head->next == NULL)
-			{
-				printf("Error: no moves to redo\n");
-			}
-			else if(undoList->head->prev == NULL)
-			{
-				movesNum = undoList->head->movesNum;
-
-				x=undoList->head->moves[0][0];
-				y=undoList->head->moves[0][1];
-				prevValue = undoList->head->moves[0][2];
-				z=undoList->head->moves[0][3];
-
-				if(board->cells[x][y].value != prevValue)
-				{
-					undoList->head = undoList->head->next;
-				}
-				movesNum = undoList->head->movesNum;
-				for(i=0;i<movesNum;i++)
-				{
-					x=undoList->head->moves[i][0];
-					y=undoList->head->moves[i][1];
-					prevValue = undoList->head->moves[i][2];
-					z=undoList->head->moves[i][3];
-					board->cells[x][y].value = z;
-					prevChar = digitToChar(prevValue);
-					zChar = digitToChar(z);
-					markErrors(board, x, y);
-					printf("Redo %d,%d: from %c to %c\n",y+1,x+1,prevChar,zChar);
-				}
-
-			}
-			else
-			{
-				undoList->head = undoList->head->next;
-				movesNum = undoList->head->movesNum;
-				for(i=0;i<movesNum;i++)
-				{
-					x=undoList->head->moves[i][0];
-					y=undoList->head->moves[i][1];
-					prevValue = undoList->head->moves[i][2];
-					z=undoList->head->moves[i][3];
-					board->cells[x][y].value = z;
-					prevChar = digitToChar(prevValue);
-					zChar = digitToChar(z);
-					markErrors(board, x, y);
-					printf("Redo %d,%d: from %c to %c\n",y+1,x+1,prevChar,zChar);
-				}
-			}
+	else{
+		undoList->current = undoList->current->next;
+		movesNum = undoList->current->movesNum;
+		for(i=0;i<movesNum;i++){
+			x=undoList->current->moves[i][0];
+			y=undoList->current->moves[i][1];
+			prevValue = undoList->current->moves[i][2];
+			z=undoList->current->moves[i][3];
+			board->cells[x][y].value = z;
+			prevChar = digitToChar(prevValue);
+			zChar = digitToChar(z);
+			markErrors(board, x, y);
+			if(printVal)
+				printf("Redo %d,%d: from %c to %c\n",y+1,x+1,prevChar,zChar);
 		}
 	}
 }
 
 
-void undo(Board* board, List* undoList)
+void undo(Board* board, List* undoList, int printVal)
 {
 	int x,y,z,prevValue,movesNum,i;
 	char prevChar,zChar;
-	if(undoList->head == NULL)
-	{
-		printf("Error: no moves to undo\n");
+	if(undoList->current->prev == NULL){
+		if(printVal)
+			printf("Error: no moves to undo\n");
 	}
-	else
-	{
-		if(undoList->head->prev == NULL)
-		{
-			x=undoList->head->moves[0][0];
-			y=undoList->head->moves[0][1];
-			z=undoList->head->moves[0][2];
-			prevValue = undoList->head->moves[0][3];
-			if(board->cells[x][y].value == z)
-				printf("Error: no moves to undo\n");
-			else
-			{
-				/*do it for each move in this node */
-				movesNum = undoList->head->movesNum;
-				for(i=0;i<movesNum;i++)
-				{
-					x=undoList->head->moves[i][0];
-					y=undoList->head->moves[i][1];
-					z=undoList->head->moves[i][2];
-					prevValue = undoList->head->moves[i][3];
-
-					board->cells[x][y].value = z;
-					prevChar = digitToChar(prevValue);
-					zChar = digitToChar(z);
-					markErrors(board, x, y);
-					printf("Undo %d,%d: from %c to %c\n",y+1,x+1,prevChar,zChar);
-				}
-			}
-		}
-		else
-		{
-			movesNum = undoList->head->movesNum;
-			for(i=0;i<movesNum;i++)
-			{
-				x=undoList->head->moves[i][0];
-				y=undoList->head->moves[i][1];
-				z=undoList->head->moves[i][2];
-				prevValue = undoList->head->moves[i][3];
-				board->cells[x][y].value = z;
-				prevChar = digitToChar(prevValue);
-				zChar = digitToChar(z);
-				markErrors(board, x, y);
+	else{
+		movesNum = undoList->current->movesNum;
+		for(i=0;i<movesNum;i++){
+			x=undoList->current->moves[i][0];
+			y=undoList->current->moves[i][1];
+			z=undoList->current->moves[i][2];
+			prevValue = undoList->current->moves[i][3];
+			board->cells[x][y].value = z;
+			prevChar = digitToChar(prevValue);
+			zChar = digitToChar(z);
+			markErrors(board, x, y);
+			if(printVal)
 				printf("Undo %d,%d: from %c to %c\n",y+1,x+1,prevChar,zChar);
-			}
-			undoList->head = undoList->head->prev;
 		}
+		undoList->current = undoList->current->prev;
 	}
 }
 
-void reset(Board* board, List* undoList){
-	while(undoList->head->prev != NULL){
-		undo(board,undoList);
+void reset(Board* board, List** undoList){
+	while((*undoList)->current->prev != NULL){
+		undo(board,*undoList,0);
 	}
-	undo(board,undoList);
-
-	destroyList(undoList);
-	undoList = initList();
-
+	destroyList(*undoList);
+	*undoList = initList();
 	printf("Board reset\n");
 }
 
@@ -489,7 +388,7 @@ void doEdit(char *path,Board** userBoard, List** undoList, int mode)
 	{
 		destroyBoard(*userBoard);
 		/* need to initilalize an empty board */
-		*userBoard = init(3, 3); /* initiate 3*3 - maybe change it to a DEFINE or something */
+		*userBoard = init(3,3); /* initiate 3*3 - maybe change it to a DEFINE or something */
 		(*userBoard)->markErrors = 1;/* mark errors parameter is 1 */
 		destroyList(*undoList);
 		*undoList = initList();
@@ -539,7 +438,7 @@ void doNumSolutions(Board* userBoard){
 
 		if(numSolutions==1)
 			printf("This is a good board!\n");
-		else
+		else if(numSolutions>1)
 			printf("The puzzle has more than 1 solution, try to edit it further\n");
 	}
 }

@@ -160,7 +160,7 @@ void read()
 
 				else if (strcmp(string[0],"reset")==0 && (mode==1 || mode==2))/*available in solve or edit*/
 				{
-					reset(userBoard,undoList);
+					reset(userBoard,&undoList);
 					solved = 0;
 				}
 
@@ -216,11 +216,11 @@ void read()
 				}
 				else if (strcmp(string[0],"undo")==0 && (mode==1 || mode==2)) /*available in solve or edit*/
 				{
-					undo(userBoard,undoList);
+					undo(userBoard,undoList,1);
 				}
 				else if (strcmp(string[0],"redo")==0 && (mode==1 || mode==2)) /*available in solve or edit*/
 				{
-					redo(userBoard,undoList);
+					redo(userBoard,undoList,1);
 				}
 				else if (strcmp(string[0],"save")==0 && string[1]!=NULL && (mode==1 || mode==2)) /*available in solve or edit*/
 				{

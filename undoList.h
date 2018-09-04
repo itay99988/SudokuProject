@@ -11,7 +11,7 @@ typedef struct Node {
 } Node;
 
 typedef struct List {
-	Node* head;
+	Node* current;
 } List;
 
 List* initList();

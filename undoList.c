@@ -8,35 +8,35 @@
 List* initList()
 {
 	List* newList;
+	Node* newNode;
 	newList = malloc(sizeof(List));
-	if(!newList)
+	newNode = malloc(sizeof(Node));
+	if(!newList || !newNode)
 	{
 		printf("Error: malloc has failed\n");
 		exit(0);
 		return NULL;
 	}
-	newList->head = NULL;
+	/*dummy node preparation*/
+	newNode->movesNum = -1;
+	newNode->prev = NULL;
+	newNode->next = NULL;
+
+	newList->current = newNode;
 	return newList;
 }
 
 void addMove(List* undoList, Node* newNode)
 {
-	if(undoList->head == NULL)
-	{
-		undoList->head = newNode;
-	}
-	else
-	{
-		/*we have to clear beyond the current node
-		suppose that the clear beyond erases everything after current
-		and assigns null in the next field of current
-		*/
-		clearBeyond(undoList-> head);
-		newNode -> next = NULL;
-		undoList-> head -> next = newNode;
-		newNode -> prev = undoList-> head;
-		undoList-> head = undoList-> head -> next;
-	}
+	/*we have to clear beyond the current node
+	suppose that the clear beyond erases everything after current
+	and assigns null in the next field of current
+	*/
+	clearBeyond(undoList-> current);
+	newNode -> next = NULL;
+	undoList-> current -> next = newNode;
+	newNode -> prev = undoList-> current;
+	undoList-> current = undoList-> current -> next;
 }
 
 void clearBeyond(Node* cur)
@@ -79,19 +79,17 @@ void destroyNode(Node* newNode)
 void destroyList(List* undoList)
 {
 	if(undoList){
-		if(undoList->head)
+		if(undoList->current)
 		{
 			/* go to the beginning of the list */
-			while (undoList->head->prev != NULL)
+			while (undoList->current->prev != NULL)
 				{
-					undoList->head = undoList->head->prev;
+					undoList->current = undoList->current->prev;
 				}
-
 			/*clear from mem. every node but the first one*/
-			clearBeyond(undoList->head);
-
+			clearBeyond(undoList->current);
 			/* also clear the first node */
-			destroyNode(undoList->head);
+			destroyNode(undoList->current);
 		}
 
 		/* lastly, clear the list itself */
