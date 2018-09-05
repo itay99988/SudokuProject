@@ -1,11 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "SPBufferset.h"
 #include <string.h>
-#include "game.h"
-#include "undoList.h"
+#include "SPBufferset.h"
 #include "stack.h"
 
+/* Public methods: */
 
 Stack* initStack() {
     Stack* newStack = malloc(sizeof(Stack));
@@ -62,3 +61,5 @@ int isEmpty(Stack* stack) {
 void destroyStack(Stack* stack) {
 	free(stack);
 }
+
+/* End of public methods */

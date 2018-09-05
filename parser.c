@@ -6,9 +6,9 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "SPBufferset.h"
 #include <string.h>
 #include <ctype.h>
+#include "SPBufferset.h"
 #include "game.h"
 #include "solver.h"
 #include "undoList.h"
@@ -17,26 +17,10 @@
 #include "mainAux.h"
 #include "ILPSolver.h"
 
+/* Private methods declaration */
+int isInt(char* string);
 
-
-
-
-int isInt(char *string)
-{
-        int i, stringLength = strlen(string);
-
-        for(i = 0; i < stringLength; i++)
-        {
-                if(isdigit(string[i]) == 0) /*|| ispunct(string[i]) != 0 ... */
-                        break;
-        }
-
-        if(i != stringLength)
-                return 0;
-        else
-                return 1;
-}
-
+/* Public methods: */
 
 /*
  * read
@@ -60,7 +44,7 @@ void read()
 	char delimiters[] = " \t\r\n";
 	int x,y,z;
 	int boardsize;
-	List* undoList = initList();
+	List* undoList;
 	int i = 0;
 	int solved = 0; /*'set' returns 2 if puzzle was solved*/
 	Board* userBoard;
@@ -71,7 +55,8 @@ void read()
 
 	/* dimensions definition: */
 	boardsize = 9; /*will be changed*/
-	userBoard = init(3,3); /*'userBoard' may be used uninitialized...*/
+	userBoard = NULL;
+	undoList = NULL;
 
 	printf("Enter your command:\n");
 	if(fgets(input, sizeof input, stdin)!=NULL)
@@ -266,5 +251,26 @@ void read()
 
 	  /*NEED TO EXIT*/
 	  exitGame(userBoard, undoList);
+}
+
+/* End of public methods */
+
+
+/* Private methods: */
+
+int isInt(char *string)
+{
+        int i, stringLength = strlen(string);
+
+        for(i = 0; i < stringLength; i++)
+        {
+                if(isdigit(string[i]) == 0) /*|| ispunct(string[i]) != 0 ... */
+                        break;
+        }
+
+        if(i != stringLength)
+                return 0;
+        else
+                return 1;
 }
 

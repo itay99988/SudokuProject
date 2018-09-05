@@ -5,15 +5,13 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "SPBufferset.h"
 #include <string.h>
 #include <time.h>
+#include "SPBufferset.h"
 #include "game.h"
 #include "solver.h"
-#include "mainAux.h"
-#include "parser.h"
 
-
+/* Public methods: */
 int save (Board* board, char *path, int gameMode)
 {
 	int i, j;
@@ -111,3 +109,5 @@ int load (char *path, Board** board, int mode)
 		return 1;
 	}
 }
+
+/* End of public methods */

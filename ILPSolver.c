@@ -7,9 +7,10 @@
  *  work on the nova server
 */
 
-#include "game.h"
 #include "solver.h"
+#include "game.h"
 
+/* Public methods: */
 int ilpSolve(Board *userBoard)
 {
 	int i,j,k;

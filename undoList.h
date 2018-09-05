@@ -1,8 +1,6 @@
 #ifndef UNDOLIST_H_
 #define UNDOLIST_H_
 
-#include "game.h"
-
 typedef struct Node {
     int **moves;
     int movesNum;
@@ -16,8 +14,6 @@ typedef struct List {
 
 List* initList();
 void addMove(List* undoList, Node* newNode);
-void clearBeyond(Node* cur);
-void destroyNode(Node* newNode);
 void destroyList(List* undoList);
 
 #endif /* UNDOLIST_H_ */

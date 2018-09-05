@@ -1,9 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "SPBufferset.h"
 #include <string.h>
-#include "game.h"
+#include "SPBufferset.h"
 #include "undoList.h"
+
+/* Private methods declaration */
+void clearBeyond(Node* cur);
+void destroyNode(Node* newNode);
+
+
+/* Public methods: */
 
 List* initList()
 {
@@ -19,6 +25,7 @@ List* initList()
 	}
 	/*dummy node preparation*/
 	newNode->movesNum = -1;
+	newNode->moves = NULL;
 	newNode->prev = NULL;
 	newNode->next = NULL;
 
@@ -39,6 +46,32 @@ void addMove(List* undoList, Node* newNode)
 	undoList-> current = undoList-> current -> next;
 }
 
+/* clears an entire list from memory */
+void destroyList(List* undoList)
+{
+	if(undoList){
+		if(undoList->current)
+		{
+			/* go to the beginning of the list */
+			while (undoList->current->prev != NULL)
+				{
+					undoList->current = undoList->current->prev;
+				}
+			/*clear from mem. every node but the first one*/
+			clearBeyond(undoList->current);
+			/* also clear the first node */
+			destroyNode(undoList->current);
+		}
+
+		/* lastly, clear the list itself */
+		free(undoList);
+	}
+}
+
+/* End of public methods */
+
+
+/* Private methods: */
 void clearBeyond(Node* cur)
 {
 	Node* tempPointer;
@@ -64,38 +97,18 @@ void destroyNode(Node* newNode)
 {
 	int movesNum;
 	int i;
-	movesNum = newNode->movesNum;
-	for(i=0;i<movesNum;i++)
-	{
-		free(newNode->moves[i]);
-	}
-	free(newNode->moves);
-	newNode->next=NULL;
-	newNode->prev=NULL;
-	free(newNode);
-}
-
-/* clears an entire list from memory */
-void destroyList(List* undoList)
-{
-	if(undoList){
-		if(undoList->current)
-		{
-			/* go to the beginning of the list */
-			while (undoList->current->prev != NULL)
-				{
-					undoList->current = undoList->current->prev;
-				}
-			/*clear from mem. every node but the first one*/
-			clearBeyond(undoList->current);
-			/* also clear the first node */
-			destroyNode(undoList->current);
+	if(newNode){
+		movesNum = newNode->movesNum;
+		for(i=0;i<movesNum;i++){
+			if(newNode->moves[i])
+				free(newNode->moves[i]);
 		}
-
-		/* lastly, clear the list itself */
-		free(undoList);
+		if(newNode->moves)
+			free(newNode->moves);
+		newNode->next=NULL;
+		newNode->prev=NULL;
+		free(newNode);
 	}
 }
 
-
-
+/* End of private methods */
