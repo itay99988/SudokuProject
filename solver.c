@@ -9,7 +9,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include "SPBufferset.h"
 #include "game.h"
 #include "stack.h"
 #include "mainAux.h"
@@ -329,6 +328,9 @@ int getNumSolutions(Board* board)
 		if(foundVal)
 			break;
 	}
+	/* in case the board is full and valid */
+	if(!foundVal)
+		return 1;
 
 	push(stack,i,j,1);
 	while(!isEmpty(stack)){
