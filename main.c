@@ -7,9 +7,9 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "SPBufferset.h"
 #include <time.h>
 #include "game.h"
+#include "SPBufferset.h"
 
 int main(){
 	SP_BUFF_SET();

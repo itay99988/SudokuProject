@@ -7,7 +7,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include "SPBufferset.h"
 #include "game.h"
 #include "solver.h"
 

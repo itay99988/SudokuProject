@@ -8,7 +8,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include "SPBufferset.h"
 #include "game.h"
 #include "mainAux.h"
 #include "solver.h"
@@ -54,6 +53,7 @@ void doSolve(char *path, Board** userBoard, List** undoList,int mode, int curren
 	}
 	else
 	{
+		destroyBoard(*userBoard);
 		load(path,userBoard,mode);
 		destroyList(*undoList);
 		(*undoList) = initList();
