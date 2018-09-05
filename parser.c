@@ -8,12 +8,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include "SPBufferset.h"
 #include "game.h"
 #include "solver.h"
 #include "undoList.h"
 #include "tools.h"
-#include "solver.h"
 #include "mainAux.h"
 #include "ILPSolver.h"
 
@@ -152,7 +150,7 @@ void read()
 				else if (strcmp(string[0],"solve")==0 && string[1]!=NULL) /*available in every mode*/
 				{
 					mode = 1;
-					doSolve(string[1], &userBoard, &undoList, mode, userBoard->markErrors);
+					doSolve(string[1], &userBoard, &undoList, mode, (userBoard ? userBoard->markErrors : 1));
 				}
 				else if (strcmp(string[0],"edit")==0) /*available in every mode*/
 				{
