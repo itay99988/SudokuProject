@@ -13,6 +13,8 @@ typedef struct List {
 } List;
 
 List* initList();
+void insertSingleMove(int** moves, int moveNum, int x, int y, int prevValue, int z);
+void updateMovesInNode(Node** newNode,int** moves, int movesNum);
 void addMove(List* undoList, Node* newNode);
 void destroyList(List* undoList);
 

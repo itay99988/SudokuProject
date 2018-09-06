@@ -32,6 +32,31 @@ List* initList()
 	return newList;
 }
 
+void insertSingleMove(int** moves, int moveNum, int x, int y, int prevValue, int z){
+	int* oneMove = malloc(4*sizeof(int));
+	if(!oneMove)
+	{
+		printf("Error: malloc has failed\n");
+		exit(0);
+	}
+
+	oneMove[0]=x,oneMove[1]=y,oneMove[2]=prevValue,oneMove[3]=z;
+	moves[moveNum] = oneMove;
+}
+
+void updateMovesInNode(Node** newNode,int** moves, int movesNum){
+	*newNode = malloc(sizeof(Node));
+	if(!(*newNode))
+	{
+		printf("Error: malloc has failed\n");
+		exit(0);
+	}
+	(*newNode)->moves = moves;
+	(*newNode)->movesNum = movesNum;
+	(*newNode)->next = NULL;
+	(*newNode)->prev = NULL;
+}
+
 void addMove(List* undoList, Node* newNode)
 {
 	/*we have to clear beyond the current node

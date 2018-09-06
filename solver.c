@@ -16,7 +16,7 @@
 
 /* private methods declaration: */
 void markErrors(Board *board, int row, int column);
-
+int findFirstCell(Board* board, int* x, int* y);
 
 /* Public methods: */
 
@@ -79,9 +79,8 @@ int validate(Board* board){
 int generate(Board* userBoard, List *undoList, int x, int y){
 	int i,j,l,N,randRow,randCol, chosenValue;
 	int pickedXCells=1, isBoardSolvable=1, filledSuccessfully = 0, randIndex=0, changesCount=0;
-	int* oneMove;
 	int** moves;
-	Node* newNode;
+	Node* newNode = NULL;
 
 	N=userBoard->boardsize;
 	if(y==0)
@@ -144,31 +143,13 @@ int generate(Board* userBoard, List *undoList, int x, int y){
 	for(i=0;i<N;i++){
 		for(j=0;j<N;j++){
 			if(userBoard->cells[i][j].value!=0){
-				oneMove = malloc(4*sizeof(int));
-				if(!oneMove){
-					printf("Error: malloc has failed\n");
-					exit(0);
-					return 0;
-				}
-				oneMove[0]=i; oneMove[1]=j; oneMove[2]=0; oneMove[3]=userBoard->cells[i][j].value;
-				moves[changesCount] = oneMove;
+				insertSingleMove(moves, changesCount, i, j, 0, userBoard->cells[i][j].value);
 				changesCount++;
 			}
 		}
 	}
-
 	/*node preparation*/
-	newNode = malloc(sizeof(Node));
-	if(!newNode){
-		printf("Error: malloc has failed\n");
-		exit(0);
-		return 0;
-	}
-	newNode->moves = moves;
-	newNode->movesNum = y;
-	newNode->next = NULL;
-	newNode->prev = NULL;
-	/* adding the new node to the list */
+	updateMovesInNode(&newNode,moves, y);
 	addMove(undoList,newNode);
 	/* end of node preparation */
 
@@ -181,11 +162,10 @@ void autoFill(Board *board,List *undoList)
 	int N;
 	int optionalValue,movesNum,prevValue;
 	int theOption = 0;
-	int* oneMove;
 	int** moves;
 	Stack* stack;
 	StackNode* poppedNode;
-	Node* newNode;
+	Node* newNode = NULL;
 
 	/* dimensions definition: */
 	N=board->boardsize;
@@ -197,10 +177,8 @@ void autoFill(Board *board,List *undoList)
 			printf("Error: malloc has failed\n");
 			exit(0);
 		}
-	for (i=0;i<N; i++)
-	{
-		for (j=0; j<N; j++)
-		{
+	for (i=0;i<N; i++){
+		for (j=0; j<N; j++){
 			if(board->cells[i][j].value!=0)
 				continue;
 			for (optionalValue = 1; optionalValue <= N; optionalValue++)
@@ -208,15 +186,13 @@ void autoFill(Board *board,List *undoList)
 					if (theOption == 0){
 						theOption = optionalValue;
 					}
-					else
-					{
+					else{
 						theOption = 0;
 						break;
 					}
 				}
 
-			if (theOption != 0)
-			{
+			if (theOption != 0){
 				push(stack,i,j,theOption);
 				printf("Cell <%d,%d> set to %d\n",j+1,i+1,theOption);
 				theOption = 0;
@@ -230,37 +206,19 @@ void autoFill(Board *board,List *undoList)
 			printf("Error: malloc has failed\n");
 			exit(0);
 		}
-	while(!isEmpty(stack))
-	{
+	while(!isEmpty(stack)){
 		pop(stack,poppedNode);
 		prevValue = board->cells[poppedNode->column][poppedNode->row].value;
 		board->cells[poppedNode->column][poppedNode->row].value = poppedNode->value;
 		markErrors(board,poppedNode->column,poppedNode->row);
-		oneMove = malloc(4*sizeof(int));
-		if(!oneMove){
-			printf("Error: malloc has failed\n");
-			exit(0);
-		}
-		oneMove[0]=poppedNode->column,oneMove[1]=poppedNode->row,oneMove[2]=prevValue,oneMove[3]=poppedNode->value;
-		moves[stack->length] = oneMove;
+		insertSingleMove(moves, stack->length, poppedNode->column, poppedNode->row, prevValue, poppedNode->value);
 	}
 	/* update the list iff the autofill actually did something */
 	if(movesNum != 0)
 	{
 		/*node preparation*/
-		newNode = malloc(sizeof(Node));
-		if(!newNode){
-			printf("Error: malloc has failed\n");
-			exit(0);
-		}
-		newNode->moves = moves;
-		newNode->movesNum = movesNum;
-		newNode->next = NULL;
-		newNode->prev = NULL;
-
-		/* adding the new node to the list */
+		updateMovesInNode(&newNode,moves, movesNum);
 		addMove(undoList,newNode);
-
 		/* end of node preparation */
 	}
 	free(poppedNode);
@@ -304,7 +262,7 @@ int countDetBacktracking(Board* board)
 
 int getNumSolutions(Board* board)
 {
-	int i,j,size,foundVal,count;
+	int i=0,j=0,size,foundVal,count;
 	StackNode* poppedNode;
 	Stack* stack = initStack();
 
@@ -316,39 +274,18 @@ int getNumSolutions(Board* board)
 	}
 	if(!validate(board))
 		return 0;
-
 	/* find the first cell to deal with */
-	for(i=0;i<size;i++){
-		for(j=0;j<size;j++)
-			if(board->cells[i][j].fixed==0 && board->cells[i][j].value==0)
-			{
-				foundVal=1;
-				break;
-			}
-		if(foundVal)
-			break;
-	}
+	foundVal = findFirstCell(board, &i, &j);
 	/* in case the board is full and valid */
 	if(!foundVal)
 		return 1;
-
 	push(stack,i,j,1);
 	while(!isEmpty(stack)){
 		foundVal = 0;
 		if(isValid(board,top(stack)->column,top(stack)->row,top(stack)->value)){
 			board->cells[top(stack)->column][top(stack)->row].value = top(stack)->value;
 			/* find the first cell to deal with */
-			for(i=0;i<size;i++){
-				for(j=0;j<size;j++){
-					if(board->cells[i][j].fixed==0 && board->cells[i][j].value==0)
-					{
-						foundVal=1;
-						break;
-					}
-				}
-				if(foundVal)
-					break;
-			}
+			foundVal = findFirstCell(board, &i, &j);
 			if(foundVal){
 				push(stack,i,j,1);
 			}
@@ -378,7 +315,6 @@ int getNumSolutions(Board* board)
 					pop(stack,poppedNode);
 					if(stack->length>0)
 						board->cells[top(stack)->column][top(stack)->row].value = 0;
-
 				}
 				if(!isEmpty(stack))
 					top(stack)->value = top(stack)->value + 1;
@@ -508,3 +444,26 @@ void markAllBoardErrors(Board* board){
 }
 
 /* End of public methods */
+
+/* Private methods: */
+
+int findFirstCell(Board* board, int* x, int* y)
+{
+	int i=0, j=0, size = board->boardsize, foundVal=0;
+	/* find the first cell to deal with */
+	for(i=0;i<size;i++){
+		for(j=0;j<size;j++)
+			if(board->cells[i][j].fixed==0 && board->cells[i][j].value==0)
+			{
+				foundVal=1;
+				*x = i;
+				*y = j;
+				break;
+			}
+		if(foundVal)
+			break;
+	}
+	return foundVal;
+}
+
+/* End of private methods */

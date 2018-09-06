@@ -162,44 +162,32 @@ void printBoard(Board *board)
 int set(Board *board, List *undoList, int x, int y, int z, int gameMode)
 {
 	int prevValue;
-	int* oneMove;
 	int** moves;
-	Node* newNode;
+	Node* newNode = NULL;
 	if(board->cells[x][y].fixed == 1)
 	{
 		printf("Error: cell is fixed\n");
 		return 0;
 	}
 
-
 	prevValue = board->cells[x][y].value;
 	board->cells[x][y].value = z;
 
 	/*node preparation*/
 	moves = malloc(sizeof(int*));
-	oneMove = malloc(4*sizeof(int));
-	newNode = malloc(sizeof(Node));
-	if(!moves || !oneMove || !newNode)
+	if(!moves)
 	{
 		printf("Error: malloc has failed\n");
 		exit(0);
 		return 0;
 	}
-	oneMove[0]=x,oneMove[1]=y,oneMove[2]=prevValue,oneMove[3]=z;
-	moves[0] = oneMove;
-	newNode->moves = moves;
-	newNode->movesNum = 1;
-	newNode->next = NULL;
-	newNode->prev = NULL;
-
-	/* adding the new node to the list */
+	insertSingleMove(moves, 0, x, y, prevValue, z);
+	updateMovesInNode(&newNode,moves, 1);
 	addMove(undoList,newNode);
-
 	/* end of node preparation */
 
 	markErrors(board,x,y);
 	printBoard(board);
-
 
 	if (gameMode==1)  /*relevant only to solve mode */
 	{
@@ -214,8 +202,6 @@ int set(Board *board, List *undoList, int x, int y, int z, int gameMode)
 			}
 		}
 	}
-
-
 	return 1;
 }
 /*
