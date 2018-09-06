@@ -219,56 +219,86 @@ void hint(Board *solvedBoard, int x, int y)
 	printf("Hint: set cell to %d\n", solvedBoard->cells[x][y].value);
 }
 
+/*
+ * redo
+ *
+ *  This function redoes the last undone operation of user that affected the board.
+ *
+ *  @param board - pointer to the game board
+ *  @param undoList - the doubly linked list which stores the moves
+ *  @param printVal - whether of not the function print its actions
+ *  @return -
+ */
 void redo(Board* board, List* undoList, int printVal)
 {
 	int x,y,z,prevValue,movesNum,i;
 	char prevChar,zChar;
+	/* if we are pointing on the last move done by the user, then no moves to undo */
 	if(undoList->current->next == NULL){
 		if(printVal)
 			printf("Error: no moves to redo\n");
 	}
 	else{
+		/* go to the next node in the list */
 		undoList->current = undoList->current->next;
+		/* check how many moves were in the last user's turn */
 		movesNum = undoList->current->movesNum;
 		for(i=0;i<movesNum;i++){
+			/* for each move in the 2d moves array, store move data temporarely */
 			x=undoList->current->moves[i][0];
 			y=undoList->current->moves[i][1];
 			prevValue = undoList->current->moves[i][2];
 			z=undoList->current->moves[i][3];
+			/* update the game board accordingly (for each single move in user's turn)*/
 			board->cells[x][y].value = z;
 			prevChar = digitToChar(prevValue);
 			zChar = digitToChar(z);
+			/* check for errors */
 			markErrors(board, x, y);
-			if(printVal)
+			if(printVal) /* print only if we need */
 				printf("Redo %d,%d: from %c to %c\n",y+1,x+1,prevChar,zChar);
 		}
 	}
 }
 
-
+/*
+ * undo
+ *
+ *  This function undoes the last operation of user that affected the board.
+ *
+ *  @param board - pointer to the game board
+ *  @param undoList - the doubly linked list which stores the moves
+ *  @param printVal - whether of not the function print its actions
+ *  @return -
+ */
 void undo(Board* board, List* undoList, int printVal)
 {
 	int x,y,z,prevValue,movesNum,i;
 	char prevChar,zChar;
+	/* if we are pointing on the first move done by the user, then no moves to undo */
 	if(undoList->current->prev == NULL){
 		if(printVal)
 			printf("Error: no moves to undo\n");
 	}
 	else{
+		/* check how many moves were in the last user's turn */
 		movesNum = undoList->current->movesNum;
 		for(i=0;i<movesNum;i++){
+			/* for each move in the 2d moves array, store move data temporarely */
 			x=undoList->current->moves[i][0];
 			y=undoList->current->moves[i][1];
 			z=undoList->current->moves[i][2];
 			prevValue = undoList->current->moves[i][3];
+			/* update the game board accordingly (for each single move in user's turn)*/
 			board->cells[x][y].value = z;
 			prevChar = digitToChar(prevValue);
 			zChar = digitToChar(z);
+			/* check for errors */
 			markErrors(board, x, y);
-			if(printVal)
+			if(printVal) /* print only if we need */
 				printf("Undo %d,%d: from %c to %c\n",y+1,x+1,prevChar,zChar);
 		}
-		undoList->current = undoList->current->prev;
+		undoList->current = undoList->current->prev; /* go to the previous node */
 	}
 }
 

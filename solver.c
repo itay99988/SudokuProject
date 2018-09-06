@@ -65,7 +65,7 @@ int isValid(Board *board, int row, int column, int value)
  *  This function gets the actual user board, makes a copy of it and then runs ILP on the copy
  *  in order if the board is solvable.
  *  @param board - the actual game board (not a copy of it)
- *  @return -1 if solveable, 0 if not
+ *  @return -1 if solveable, 0 if not.
  */
 int validate(Board* board){
 	Board* boardCopy = copyBoard(board);
@@ -75,25 +75,45 @@ int validate(Board* board){
 	return result;
 }
 
-/* assuming the board is empty, we are in edit mode, and x,y are valid integers */
+/*
+ * generate
+ *
+ *  This function gets an empty board in edit mode, randomly chooses X cells and fills them
+ *  with valid values, solves the board and then shows only Y random cells out of N^2 available
+ *  cells. tries this 1000 times if it fails.
+ *
+ *  @param board - the actual game board
+ *  @param undoList - pointer to the undo list
+ *  @param x - as shown in the description
+ *  @param y - as shown in the description
+ *  @return -1 if function succeeded, 0 if not.
+ */
+
 int generate(Board* userBoard, List *undoList, int x, int y){
+	/* assuming the board is empty, we are in edit mode, and x,y are valid integers */
 	int i,j,l,N,randRow,randCol, chosenValue;
 	int pickedXCells=1, isBoardSolvable=1, filledSuccessfully = 0, randIndex=0, changesCount=0;
 	int** moves;
 	Node* newNode = NULL;
 
-	N=userBoard->boardsize;
+	N=userBoard->boardsize; /* n*m */
+
+	/* in this case the board stays empty anyway */
 	if(y==0)
 		return 1;
-
+	/* try to fill the board with x randomly chosen cells with randomly chosen legal values
+	 * only 1000 times.
+	 */
 	for(i=0;i<1000;i++){
 		for(j=0;j<x;j++){
+			/* randomly choose x cells */
 			randRow = rand()%N;
 			randCol = rand()%N;
 			if(userBoard->cells[randRow][randCol].value!=0){
 				j--;
 				continue;
 			}
+			/* randomly choose legal values for each cell */
 			setOptions(userBoard,randRow,randCol);
 			if(userBoard->cells[randRow][randCol].numOfOptions==0){
 				pickedXCells = 0;
@@ -104,12 +124,13 @@ int generate(Board* userBoard, List *undoList, int x, int y){
 			userBoard->cells[randRow][randCol].value = chosenValue;
 		}
 
+		/* if we didn't succeed in choosing x cells, try again */
 		if(!pickedXCells){
 			resetBoard(userBoard);
 			pickedXCells=1;
 			continue;
 		}
-
+		/* move on to the next pary only iff the new temp board is solvable */
 		isBoardSolvable = ilpSolve(userBoard);
 		if(!isBoardSolvable){
 			resetBoard(userBoard);
@@ -121,9 +142,10 @@ int generate(Board* userBoard, List *undoList, int x, int y){
 			break;
 		}
 	}
+	/* return false if we didn't succeed after 1000 times */
 	if(!filledSuccessfully)
 		return 0;
-
+	/* randomly choose cells to be removed from the fully solved board */
 	for(l=1;l<=(N*N - y);l++){
 		randRow = rand()%N;
 		randCol = rand()%N;
@@ -134,6 +156,7 @@ int generate(Board* userBoard, List *undoList, int x, int y){
 		userBoard->cells[randRow][randCol].value = 0;
 	}
 
+	/* we have to remember to move that we need since we have to update the undo list */
 	moves = malloc(y*sizeof(int*));
 	if(!moves){
 		printf("Error: malloc has failed\n");
@@ -148,10 +171,9 @@ int generate(Board* userBoard, List *undoList, int x, int y){
 			}
 		}
 	}
-	/*node preparation*/
+	/*node preparation for the undo list */
 	updateMovesInNode(&newNode,moves, y);
 	addMove(undoList,newNode);
-	/* end of node preparation */
 
 	return 1;
 }
@@ -219,7 +241,6 @@ void autoFill(Board *board,List *undoList)
 		/*node preparation*/
 		updateMovesInNode(&newNode,moves, movesNum);
 		addMove(undoList,newNode);
-		/* end of node preparation */
 	}
 	free(poppedNode);
 	destroyStack(stack);
@@ -259,7 +280,17 @@ int countDetBacktracking(Board* board)
 
 	return 1;
 }
-
+/*
+ * getNumSolutions
+ *
+ *  This function gets a game board, and returns the number of the valid solutions for this
+ *  board. this time we use an iterative solution to solve the problem. we use stack to demonstrate
+ *  the recursive calls. we push and pop from the stack depends on the iterations until we count
+ *  all the possible solutions
+ *
+ *  @param board - the actual game board
+ *  @return - number of possible solutions
+ */
 int getNumSolutions(Board* board)
 {
 	int i=0,j=0,size,foundVal,count;
@@ -268,6 +299,7 @@ int getNumSolutions(Board* board)
 
 	size=board->boardsize;
 	count=0,foundVal=0;
+	/* memory allocated for the nodes that are about to be popped */
 	poppedNode = malloc(sizeof(StackNode));
 	if (poppedNode == NULL) {
 		exit(0);
@@ -279,38 +311,47 @@ int getNumSolutions(Board* board)
 	/* in case the board is full and valid */
 	if(!foundVal)
 		return 1;
-	push(stack,i,j,1);
+	push(stack,i,j,1); /* try the first possible value  */
+	/* if the stack is not empty, it means that there are still some cases to simulate  */
 	while(!isEmpty(stack)){
 		foundVal = 0;
+		/* if the current assignment is legal, move on to the next empty cell  */
 		if(isValid(board,top(stack)->column,top(stack)->row,top(stack)->value)){
 			board->cells[top(stack)->column][top(stack)->row].value = top(stack)->value;
 			/* find the first cell to deal with */
 			foundVal = findFirstCell(board, &i, &j);
+			/* if we find another empty cell after the assignment, we go one step further in
+			 * our simulated recursion, (push new node the to stack  */
 			if(foundVal){
 				push(stack,i,j,1);
 			}
-			else{
+			else{ /* if we got here, it means that we solved the board*/
+				/* increase the counter */
 				count = count + 1;
+				/* zero the last filled cell */
 				board->cells[top(stack)->column][top(stack)->row].value = 0;
 				if(top(stack)->value<size){
 					stack->currentNode->value = stack->currentNode->value + 1;
 				}
 				else{
+					/* if this is not a valid solution, go back to a previously filled cell */
 					while(!isEmpty(stack) && top(stack)->value == size){
 						pop(stack,poppedNode);
 						if(!isEmpty(stack))
 							board->cells[top(stack)->column][top(stack)->row].value = 0;
 					}
+					/* if stack is not empty, try another possible value for the last filled cell */
 					if(!isEmpty(stack))
 						top(stack)->value = top(stack)->value + 1;
 				}
 			}
 		}
-		else{
+		else{ /* if the current assignment is illegal, try another assignment of value  */
 			if(top(stack)->value<size){
 				top(stack)->value = top(stack)->value + 1;
 			}
-			else{
+			else{/* if we tried all the options for assignment, go back to to
+					a previously filled cell*/
 				while(!isEmpty(stack) && top(stack)->value == size){
 					pop(stack,poppedNode);
 					if(stack->length>0)
@@ -321,10 +362,10 @@ int getNumSolutions(Board* board)
 			}
 		}
 	}
-
+	/*free all memory resources that were used in function*/
 	free(poppedNode);
 	destroyStack(stack);
-	return count;
+	return count; /* return the number of possible solutions */
 }
 
 void markErrors(Board *board, int row, int column)
@@ -447,6 +488,13 @@ void markAllBoardErrors(Board* board){
 
 /* Private methods: */
 
+/*
+ * findFirstCell
+ *
+ *  This function finds the first empty cell for the num_solution algorithm to deal with
+ *  it stores the x,y coordinate of the cell in the x,y parameters, and returns whether or not
+ *  this kind of cell actually exists.
+ */
 int findFirstCell(Board* board, int* x, int* y)
 {
 	int i=0, j=0, size = board->boardsize, foundVal=0;

@@ -11,9 +11,16 @@
 #include "game.h"
 #include "SPBufferset.h"
 
+/*
+ * main
+ *
+ *  This function is executed first, sets a default random seed
+ *  and calls the startGame function in order to start the game
+ *  @return 0 (always)
+ */
 int main(){
 	SP_BUFF_SET();
-	srand(time(NULL));
+	srand(time(NULL)); /* default seed for randomization */
 	startGame();
 	return 0;
 }
