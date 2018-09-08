@@ -146,10 +146,6 @@ void printBoard(Board *board)
     for (k = 0; k < 4*N + m +1; k++)
 	    printf("-");
 	printf("\n");
-
-	/* TODO: delete */
-	printf("MarkErrors = %d\n",board->markErrors);
-
 }
 
 /*

@@ -149,7 +149,6 @@ void read()
 					/* implement exit*/
 					exitGame(userBoard, undoList);
 				}
-				else
 				{
 					printf("Error: invalid command\n");
 				}
