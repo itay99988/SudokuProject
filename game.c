@@ -147,6 +147,9 @@ void printBoard(Board *board)
 	    printf("-");
 	printf("\n");
 
+	/* TODO: delete */
+	printf("MarkErrors = %d\n",board->markErrors);
+
 }
 
 /*

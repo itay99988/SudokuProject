@@ -40,8 +40,6 @@ void read()
 	char *string[256];
 
 	char delimiters[] = " \t\r\n";
-	int x,y;
-	int boardsize;
 	List* undoList;
 	int i = 0;
 	int solved = 0; /*'set' returns 2 if puzzle was solved*/
@@ -51,7 +49,6 @@ void read()
 
 
 	/* dimensions definition: */
-	boardsize = 9; /*will be changed*/
 	userBoard = NULL;
 	undoList = NULL;
 
@@ -81,7 +78,6 @@ void read()
 			  	if ((strcmp(string[0],"set")==0) && string[1]!=NULL && isInt(string[1]) && string[2]!=NULL && isInt(string[2]) && string[3]!=NULL && isInt(string[3]) && (solved!=2) && (mode==1 || mode==2)) /*available in solve or edit*/
 				{	/*need to update according to new rules - check if solved is still relevant*/
 			  		solved = doSet(userBoard,undoList, string[1], string[2], string[3],mode);
-			  		boardsize = userBoard->boardsize;
 
 					if (solved == 2)
 					{
@@ -118,13 +114,7 @@ void read()
 				}
 				else if (strcmp(string[0],"mark_errors")==0 && string[1]!=NULL && mode==1) /*available only in solve*/
 				{
-					/* implement mark errors*/
-					if (strcmp(string[1],"1")==0 || strcmp(string[1],"0")==0)
-					{
-						userBoard ->markErrors = atoi(string[1]);
-					}
-					else
-						printf("Error: the value should be 0 or 1\n");
+					doMarkErrors(userBoard, string[1]);
 				}
 				else if (strcmp(string[0],"print_board")==0 && (mode==1 || mode==2)) /*available in solve or edit*/
 				{
@@ -132,20 +122,7 @@ void read()
 				}
 				else if (strcmp(string[0],"generate")==0 && string[1]!=NULL && isInt(string[1]) && string[2]!=NULL && isInt(string[2]) && mode==2) /*available only in edit*/
 				{
-					/* implement generate*/
-					x = atoi(string[1]);
-					y = atoi(string[2]);
-					/* need to update empty cells according to d */
-					boardsize = userBoard->boardsize; /*do we need it??/*/
-
-					/* need to check - d!!! */
-					if (!((x>=0 && x<=boardsize*boardsize) && (y>=0 && y<=boardsize*boardsize))) /*maybe need to change boardsize*/
-						printf("Error: value not in range 0-%d\n",boardsize*boardsize); /*fixxxxx this!!!! */
-					/* ------------------ */
-					else
-					{
-						doGenerate(userBoard, undoList, x, y);
-					}
+					doGenerate(userBoard, undoList, string[1], string[2]);
 				}
 				else if (strcmp(string[0],"undo")==0 && (mode==1 || mode==2)) /*available in solve or edit*/
 				{
@@ -175,15 +152,9 @@ void read()
 				else
 				{
 					printf("Error: invalid command\n");
-					/*invalid = 1;*/
 				}
 
 			  	printf("Enter your command:\n");
-			  	/*
-			  	if (!invalid)
-			  		printBoard(userBoard);
-
-			  	invalid = 0;*/ /*reset the invalid*/
 		  }
 
 		  i=0;

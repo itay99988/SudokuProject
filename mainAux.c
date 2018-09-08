@@ -141,18 +141,32 @@ void doAutoFill(Board* userBoard, List* undoList){
 	}
 }
 
-void doGenerate(Board* userBoard, List* undoList, int x, int y){
-	int result;
+void doGenerate(Board* userBoard, List* undoList, char* first, char* second){
+	int result,x,y,boardsize;
 
-	if(!isBoardEmpty(userBoard))
-		printf("Error: board is not empty\n");
-	else{
-		result = generate(userBoard, undoList, x, y);
-		if(!result)
-			printf("Error: puzzle generator failed\n");
-		else
-			printBoard(userBoard);
+	x = atoi(first);
+	y = atoi(second);
+	/* need to update empty cells according to d */
+	boardsize = userBoard->boardsize; /*do we need it??/*/
+
+	/* need to check - d!!! */
+	if (!((x>=0 && x<=boardsize*boardsize) && (y>=0 && y<=boardsize*boardsize))) /*maybe need to change boardsize*/
+		printf("Error: value not in range 0-%d\n",boardsize*boardsize); /*fixxxxx this!!!! */
+	/* ------------------ */
+	else
+	{
+		if(!isBoardEmpty(userBoard))
+			printf("Error: board is not empty\n");
+		else{
+			result = generate(userBoard, undoList, x, y);
+			if(!result)
+				printf("Error: puzzle generator failed\n");
+			else
+				printBoard(userBoard);
+		}
 	}
+
+
 }
 
 void doHint(Board* userBoard, char* first,char* second){
@@ -210,6 +224,16 @@ int doSet(Board* userBoard, List* undoList, char* first, char* second,char* thir
 	}
 
 	return 0;
+}
+
+void doMarkErrors(Board* userBoard, char* first){
+	/* implement mark errors*/
+	if (strcmp(first,"1")==0 || strcmp(first,"0")==0)
+	{
+		userBoard ->markErrors = atoi(first);
+	}
+	else
+		printf("Error: the value should be 0 or 1\n");
 }
 
 /*
