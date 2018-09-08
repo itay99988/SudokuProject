@@ -146,8 +146,6 @@ void printBoard(Board *board)
     for (k = 0; k < 4*N + m +1; k++)
 	    printf("-");
 	printf("\n");
-
-	printf("current MarkErrors: %d\n", board->markErrors);
 }
 
 /*

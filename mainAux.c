@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 #include <time.h>
 #include "game.h"
 #include "mainAux.h"
@@ -23,6 +24,7 @@ void resetOption(int *options, int size);
 void printArray(int *arr, int size);
 void markAsFixed(Board *currentBoard);
 void clearFixed(Board *currentBoard);
+int isInt(char* string);
 
 /* Public methods: */
 
@@ -156,17 +158,17 @@ void doAutoFill(Board* userBoard, List* undoList, int* mode){
 }
 
 void doGenerate(Board* userBoard, List* undoList, char* first, char* second){
-	int result,x,y,boardsize;
+	int result,x,y,boardsize, numberOfCells;
 
 	x = atoi(first);
 	y = atoi(second);
-	/* need to update empty cells according to d */
-	boardsize = userBoard->boardsize; /*do we need it??/*/
+	boardsize = userBoard->boardsize;
+	numberOfCells = boardsize*boardsize;
 
-	/* need to check - d!!! */
-	if (!((x>=0 && x<=boardsize*boardsize) && (y>=0 && y<=boardsize*boardsize))) /*maybe need to change boardsize*/
-		printf("Error: value not in range 0-%d\n",boardsize*boardsize); /*fixxxxx this!!!! */
-	/* ------------------ */
+	if (!isInt(first) || !isInt(second))
+		printf("Error: value not in range 0-%d\n",numberOfCells);
+	else if (!((x>=0 && x<=numberOfCells) && (y>=0 && y<=numberOfCells)))
+		printf("Error: value not in range 0-%d\n",numberOfCells);
 	else
 	{
 		if(!isBoardEmpty(userBoard))
@@ -190,7 +192,9 @@ void doHint(Board* userBoard, char* first,char* second){
 	y = atoi(second);
 	boardsize = userBoard->boardsize; /*do we need it??/*/
 
-	if((x==0 && strcmp(first,"0")!=0)||(y==0 && strcmp(second,"0")!=0))
+	if (!isInt(first) || !isInt(second))
+		printf("Error: value not in range 1-%d\n",boardsize);
+	else if((x==0 && strcmp(first,"0")!=0)||(y==0 && strcmp(second,"0")!=0))
 			printf("Error: value not in range 1-%d\n",boardsize);
 	else if (!((x>=1 && x<=boardsize) && (y>=1 && y<=boardsize)))
 		printf("Error: value not in range 1-%d\n",boardsize);
@@ -226,9 +230,13 @@ void doSet(Board* userBoard, List* undoList, char* first, char* second,char* thi
 	z = atoi(third);
 	boardsize = (userBoard)->boardsize;
 
-	if((x==0 && strcmp(first,"0")!=0)||(y==0 && strcmp(second,"0")!=0)||(z==0 && strcmp(third,"0")!=0))
-			printf("Error: value not in range 0-%d\n",boardsize);
-	else if (!((x>=1 && x<=boardsize) && (y>=1 && y<=boardsize) && (z>=0 && z<=boardsize)))
+	if (!isInt(first) || !isInt(second) || !isInt(third))
+		printf("Error: value not in range 0-%d\n",boardsize);
+	else if((x==0 && strcmp(first,"0")!=0)||(y==0 && strcmp(second,"0")!=0)||(z==0 && strcmp(third,"0")!=0))
+		printf("Error: value not in range 0-%d\n",boardsize);
+	else if (!((x>=1 && x<=boardsize) && (y>=1 && y<=boardsize)))
+		printf("Error: value not in range 1-%d\n",boardsize);
+	else if (!(z>=0 && z<=boardsize))
 		printf("Error: value not in range 0-%d\n",boardsize);
 	else
 	{
@@ -567,4 +575,22 @@ void removeOption(int *options, int index, int boardsize)
 	options[boardsize-1]=0;
 }
 
-/* End of private methods: */
+/* End of private methods */
+
+/* Private methods: */
+
+int isInt(char *string)
+{
+        int i, stringLength = strlen(string);
+
+        for(i = 0; i < stringLength; i++)
+        {
+                if(isdigit(string[i]) == 0) /*|| ispunct(string[i]) != 0 ... */
+                        break;
+        }
+
+        if(i != stringLength)
+                return 0;
+        else
+                return 1;
+}
