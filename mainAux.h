@@ -2,8 +2,8 @@
 #define MAINAUX_H_
 
 void doSave(Board* board, char *path, int gameMode);
-void doSolve(char *path, Board** userBoard, List** undoList,int mode, int currentMarkErrors);
-void doEdit(char *path,Board** userBoard, List** undoList, int mode);
+void doSolve(char *path, Board** userBoard, List** undoList,int* mode, int currentMarkErrors);
+void doEdit(char *path,Board** userBoard, List** undoList, int* mode);
 void doValidate(Board* board);
 void doNumSolutions(Board* board);
 void doAutoFill(Board* board, List* undoList, int* mode);

@@ -45,7 +45,7 @@ void doSave(Board* userBoard, char *path, int mode)
 }
 
 
-void doSolve(char *path, Board** userBoard, List** undoList,int mode, int currentMarkErrors)
+void doSolve(char *path, Board** userBoard, List** undoList,int* mode, int currentMarkErrors)
 {
 	FILE* fp;
 	fp = fopen(path, "r");
@@ -55,8 +55,9 @@ void doSolve(char *path, Board** userBoard, List** undoList,int mode, int curren
 	}
 	else
 	{
+		(*mode) = 1; /* start a puzzle in solve mode */
 		destroyBoard(*userBoard);
-		load(path,userBoard,mode);
+		load(path,userBoard,*mode);
 		destroyList(*undoList);
 		(*undoList) = initList();
 		(*userBoard)->markErrors = currentMarkErrors;
@@ -67,7 +68,7 @@ void doSolve(char *path, Board** userBoard, List** undoList,int mode, int curren
 
 }
 
-void doEdit(char *path,Board** userBoard, List** undoList, int mode)
+void doEdit(char *path,Board** userBoard, List** undoList, int* mode)
 {
 	FILE* fp;
 	if (path!=NULL) /*there is a parameter*/
@@ -79,8 +80,9 @@ void doEdit(char *path,Board** userBoard, List** undoList, int mode)
 		}
 		else
 		{
+			(*mode) = 2; /* start a puzzle in edit mode */
 			destroyBoard(*userBoard);
-			load(path,userBoard,mode);
+			load(path,userBoard,*mode);
 
 			(*userBoard)->markErrors = 1;/* mark errors parameter is 1 */
 			destroyList(*undoList);
@@ -92,6 +94,7 @@ void doEdit(char *path,Board** userBoard, List** undoList, int mode)
 	else
 	{
 		destroyBoard(*userBoard);
+		(*mode) = 2; /* start a puzzle in edit mode */
 		/* need to initilalize an empty board */
 		*userBoard = init(3,3); /* initiate 3*3 - maybe change it to a DEFINE or something */
 		(*userBoard)->markErrors = 1;/* mark errors parameter is 1 */
