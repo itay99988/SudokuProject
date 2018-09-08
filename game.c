@@ -16,7 +16,7 @@
 #include "parser.h"
 
 /* Private methods declaration */
-static char digitToChar(int c);
+/*static char digitToChar(int c);*/
 
 
 /* Public methods: */
@@ -231,7 +231,6 @@ void hint(Board *solvedBoard, int x, int y)
 void redo(Board* board, List* undoList, int printVal, int* mode)
 {
 	int x,y,z,prevValue,movesNum,i;
-	char prevChar,zChar;
 	/* if we are pointing on the last move done by the user, then no moves to undo */
 	if(undoList->current->next == NULL){
 		if(printVal)
@@ -250,12 +249,19 @@ void redo(Board* board, List* undoList, int printVal, int* mode)
 			z=undoList->current->moves[i][3];
 			/* update the game board accordingly (for each single move in user's turn)*/
 			board->cells[x][y].value = z;
-			prevChar = digitToChar(prevValue);
-			zChar = digitToChar(z);
 			/* check for errors */
 			markErrors(board, x, y);
 			if(printVal) /* print only if we need */
-				printf("Redo %d,%d: from %c to %c\n",y+1,x+1,prevChar,zChar);
+			{
+				if(prevValue==0 && z==0)
+					printf("Redo %d,%d: from _ to _\n",y+1,x+1);
+				else if (prevValue==0)
+					printf("Redo %d,%d: from _ to %d\n",y+1,x+1, z);
+				else if (z==0)
+					printf("Redo %d,%d: from %d to _\n",y+1,x+1, prevValue);
+				else
+					printf("Redo %d,%d: from %d to %d\n",y+1,x+1, prevValue, z);
+			}
 
 
 			if (*mode==1)  /*relevant only to solve mode */
@@ -288,7 +294,6 @@ void redo(Board* board, List* undoList, int printVal, int* mode)
 void undo(Board* board, List* undoList, int printVal)
 {
 	int x,y,z,prevValue,movesNum,i;
-	char prevChar,zChar;
 	/* if we are pointing on the first move done by the user, then no moves to undo */
 	if(undoList->current->prev == NULL){
 		if(printVal)
@@ -305,12 +310,19 @@ void undo(Board* board, List* undoList, int printVal)
 			prevValue = undoList->current->moves[i][3];
 			/* update the game board accordingly (for each single move in user's turn)*/
 			board->cells[x][y].value = z;
-			prevChar = digitToChar(prevValue);
-			zChar = digitToChar(z);
 			/* check for errors */
 			markErrors(board, x, y);
 			if(printVal) /* print only if we need */
-				printf("Undo %d,%d: from %c to %c\n",y+1,x+1,prevChar,zChar);
+			{
+				if(prevValue==0 && z==0)
+					printf("Undo %d,%d: from _ to _\n",y+1,x+1);
+				else if (prevValue==0)
+					printf("Undo %d,%d: from _ to %d\n",y+1,x+1, z);
+				else if (z==0)
+					printf("Undo %d,%d: from %d to _\n",y+1,x+1, prevValue);
+				else
+					printf("Undo %d,%d: from %d to %d\n",y+1,x+1, prevValue, z);
+			}
 		}
 		undoList->current = undoList->current->prev; /* go to the previous node */
 	}
@@ -362,7 +374,7 @@ void startGame()
 
 
 /* Private methods: */
-
+/*
 static char digitToChar(int c)
 {
 	if(c==0)
@@ -370,5 +382,5 @@ static char digitToChar(int c)
 	else
 		return c + '0';
 }
-
+*/
 /* End of private methods */
