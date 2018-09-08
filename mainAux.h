@@ -6,11 +6,12 @@ void doSolve(char *path, Board** userBoard, List** undoList,int mode, int curren
 void doEdit(char *path,Board** userBoard, List** undoList, int mode);
 void doValidate(Board* board);
 void doNumSolutions(Board* board);
-void doAutoFill(Board* board, List* undoList);
+void doAutoFill(Board* board, List* undoList, int* mode);
 void doGenerate(Board* userBoard, List* undoList, char* first, char* second);
 void doHint(Board* userBoard, char* first,char* second);
 void doMarkErrors(Board* userBoard, char* first);
-int doSet(Board* userBoard, List* undoList, char* first,char* second, char* third, int mode);
+void doSet(Board* userBoard, List* undoList, char* first,char* second, char* third, int* mode);
+void doUndo(Board* board, List* undoList, int printVal, int* mode);
 void setOptions(Board *board, int row, int column);
 void destroyBoard(Board *currentBoard);
 Board* copyBoard(Board *currentBoard);

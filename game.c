@@ -228,7 +228,7 @@ void hint(Board *solvedBoard, int x, int y)
  *  @param printVal - whether of not the function print its actions
  *  @return -
  */
-void redo(Board* board, List* undoList, int printVal)
+void redo(Board* board, List* undoList, int printVal, int* mode)
 {
 	int x,y,z,prevValue,movesNum,i;
 	char prevChar,zChar;
@@ -256,6 +256,21 @@ void redo(Board* board, List* undoList, int printVal)
 			markErrors(board, x, y);
 			if(printVal) /* print only if we need */
 				printf("Redo %d,%d: from %c to %c\n",y+1,x+1,prevChar,zChar);
+
+
+			if (*mode==1)  /*relevant only to solve mode */
+			{
+				if(isBoardFull(board))
+				{
+					if (isThereAnError(board))
+						printf("Puzzle solution erroneous\n");
+					else
+					{
+						printf("Puzzle solved successfully\n");
+						(*mode) = 0;
+					}
+				}
+			}
 		}
 	}
 }

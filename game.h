@@ -40,7 +40,7 @@ Board* init(int n, int m);
 void printBoard(Board *board);
 int set(Board *board, List *undoList, int x, int y, int z, int gameMode);
 void hint(Board *solvedBoard, int x, int y);
-void redo(Board* board, List* undoList, int printVal);
+void redo(Board* board, List* undoList, int printVal, int* mode);
 void undo(Board* board, List* undoList, int printVal);
 void reset(Board* board, List** undoList);
 void exitGame(Board *userBoard, List* undoList);

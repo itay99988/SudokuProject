@@ -131,13 +131,24 @@ void doNumSolutions(Board* userBoard){
 	}
 }
 
-void doAutoFill(Board* userBoard, List* undoList){
+void doAutoFill(Board* userBoard, List* undoList, int* mode){
 	if(isThereAnError(userBoard))
 		printf("Error: board contains erroneous values\n");
 	else
 	{
 		autoFill(userBoard,undoList);
 		printBoard(userBoard);
+
+		if(isBoardFull(userBoard))
+		{
+			if (isThereAnError(userBoard))
+				printf("Puzzle solution erroneous\n");
+			else
+			{
+				printf("Puzzle solved successfully\n");
+				(*mode) = 0;
+			}
+		}
 	}
 }
 
@@ -205,7 +216,7 @@ void doHint(Board* userBoard, char* first,char* second){
 
 }
 
-int doSet(Board* userBoard, List* undoList, char* first, char* second,char* third, int mode){
+void doSet(Board* userBoard, List* undoList, char* first, char* second,char* third, int* mode){
 	int x,y,z, boardsize, solved;
 	x = atoi(first);
 	y = atoi(second);
@@ -218,12 +229,13 @@ int doSet(Board* userBoard, List* undoList, char* first, char* second,char* thir
 		printf("Error: value not in range 0-%d\n",boardsize);
 	else
 	{
-		solved = set(userBoard, undoList ,y-1,x-1,z, mode);
+		solved = set(userBoard, undoList ,y-1,x-1,z, *mode);
 
-		return solved;
+		if (solved == 2)
+		{
+			(*mode) = 0;
+		}
 	}
-
-	return 0;
 }
 
 void doMarkErrors(Board* userBoard, char* first){
@@ -236,6 +248,24 @@ void doMarkErrors(Board* userBoard, char* first){
 		printf("Error: the value should be 0 or 1\n");
 }
 
+void doUndo(Board* board, List* undoList, int printVal, int* mode){
+	undo(board,undoList,printVal);
+
+	if (*mode==1)  /*relevant only to solve mode */
+	{
+		if(isBoardFull(board))
+		{
+			if (isThereAnError(board))
+				printf("Puzzle solution erroneous\n");
+			else
+			{
+				printf("Puzzle solved successfully\n");
+				(*mode) = 0;
+			}
+		}
+	}
+
+}
 /*
  * setOptions
  *
