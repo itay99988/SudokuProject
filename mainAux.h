@@ -8,6 +8,8 @@ void doValidate(Board* board);
 void doNumSolutions(Board* board);
 void doAutoFill(Board* board, List* undoList);
 void doGenerate(Board* userBoard, List* undoList, int x, int y);
+void doHint(Board* userBoard, char* first,char* second);
+int doSet(Board* userBoard, List* undoList, char* first,char* second, char* third, int mode);
 void setOptions(Board *board, int row, int column);
 void destroyBoard(Board *currentBoard);
 Board* copyBoard(Board *currentBoard);

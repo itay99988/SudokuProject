@@ -7,11 +7,13 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 #include "game.h"
 #include "mainAux.h"
 #include "solver.h"
 #include "tools.h"
+#include "ILPSolver.h"
 
 /* private methods declaration: */
 void addOption(int *options, int value, int boardsize);
@@ -151,6 +153,63 @@ void doGenerate(Board* userBoard, List* undoList, int x, int y){
 		else
 			printBoard(userBoard);
 	}
+}
+
+void doHint(Board* userBoard, char* first,char* second){
+	int x,y,boardsize, solved;
+	Board* fullBoard;
+	x = atoi(first);
+	y = atoi(second);
+	boardsize = userBoard->boardsize; /*do we need it??/*/
+
+	if((x==0 && strcmp(first,"0")!=0)||(y==0 && strcmp(second,"0")!=0))
+			printf("Error: value not in range 1-%d\n",boardsize);
+	else if (!((x>=1 && x<=boardsize) && (y>=1 && y<=boardsize)))
+		printf("Error: value not in range 1-%d\n",boardsize);
+	else if (isThereAnError(userBoard)){
+		printf("Error: board contains erroneous values\n");
+	}
+	else
+	{
+		if (userBoard->cells[y-1][x-1].fixed==1)
+			printf("Error: cell is fixed\n");
+		else if (userBoard->cells[y-1][x-1].value!=0)
+			printf("Error: cell already contains a value\n");
+		else
+		{
+			/*run ILP and get...*/
+			fullBoard = copyBoard(userBoard);
+			solved = ilpSolve(fullBoard);
+			if (solved==0)
+				printf("Error: board is unsolvable\n");
+			else
+				hint(fullBoard,y-1,x-1);
+			/*free the solved board's memory*/
+			destroyBoard(fullBoard);
+		}
+	}
+
+}
+
+int doSet(Board* userBoard, List* undoList, char* first, char* second,char* third, int mode){
+	int x,y,z, boardsize, solved;
+	x = atoi(first);
+	y = atoi(second);
+	z = atoi(third);
+	boardsize = (userBoard)->boardsize;
+
+	if((x==0 && strcmp(first,"0")!=0)||(y==0 && strcmp(second,"0")!=0)||(z==0 && strcmp(third,"0")!=0))
+			printf("Error: value not in range 0-%d\n",boardsize);
+	else if (!((x>=1 && x<=boardsize) && (y>=1 && y<=boardsize) && (z>=0 && z<=boardsize)))
+		printf("Error: value not in range 0-%d\n",boardsize);
+	else
+	{
+		solved = set(userBoard, undoList ,y-1,x-1,z, mode);
+
+		return solved;
+	}
+
+	return 0;
 }
 
 /*

@@ -40,13 +40,12 @@ void read()
 	char *string[256];
 
 	char delimiters[] = " \t\r\n";
-	int x,y,z;
+	int x,y;
 	int boardsize;
 	List* undoList;
 	int i = 0;
 	int solved = 0; /*'set' returns 2 if puzzle was solved*/
 	Board* userBoard;
-	Board* fullBoard;
 
 	/*const int initialBoardDimension = 3;  according to the forum  is 3*3 - want to change it to define???, was moved to game.c*/
 
@@ -81,59 +80,18 @@ void read()
 		  {
 			  	if ((strcmp(string[0],"set")==0) && string[1]!=NULL && isInt(string[1]) && string[2]!=NULL && isInt(string[2]) && string[3]!=NULL && isInt(string[3]) && (solved!=2) && (mode==1 || mode==2)) /*available in solve or edit*/
 				{	/*need to update according to new rules - check if solved is still relevant*/
-					x = atoi(string[1]);
-					y = atoi(string[2]);
-					z = atoi(string[3]);
+			  		solved = doSet(userBoard,undoList, string[1], string[2], string[3],mode);
+			  		boardsize = userBoard->boardsize;
 
-					boardsize = userBoard->boardsize; /*do we need it??/*/
-
-					if((x==0 && strcmp(string[1],"0")!=0)||(y==0 && strcmp(string[2],"0")!=0)||(z==0 && strcmp(string[3],"0")!=0))
-							printf("Error: value not in range 0-%d\n",boardsize);
-					else if (!((x>=1 && x<=boardsize) && (y>=1 && y<=boardsize) && (z>=0 && z<=boardsize)))
-						printf("Error: value not in range 0-%d\n",boardsize);
-					else
+					if (solved == 2)
 					{
-						solved = set(userBoard, undoList ,y-1,x-1,z, mode);
-
-						if (solved == 2)
-						{
-							mode = 0; /* puzzle solved, game mode is INIT */
-							solved = 0;
-						}
+						mode = 0;
+						solved = 0;
 					}
 				}
 				else if (strcmp(string[0],"hint")==0 && string[1]!=NULL && isInt(string[1]) && string[2]!=NULL && isInt(string[2]) && solved!=2 && mode==1) /*available only in solve*/
 					{/*need to update according to new rules*/
-						x = atoi(string[1]);
-						y = atoi(string[2]);
-						boardsize = userBoard->boardsize; /*do we need it??/*/
-
-						if((x==0 && strcmp(string[1],"0")!=0)||(y==0 && strcmp(string[2],"0")!=0))
-								printf("Error: value not in range 1-%d\n",boardsize);
-						else if (!((x>=1 && x<=boardsize) && (y>=1 && y<=boardsize)))
-							printf("Error: value not in range 1-%d\n",boardsize);
-						else if (isThereAnError(userBoard)){
-							printf("Error: board contains erroneous values\n");
-						}
-						else
-						{
-							if (userBoard->cells[y-1][x-1].fixed==1)
-								printf("Error: cell is fixed\n");
-							else if (userBoard->cells[y-1][x-1].value!=0)
-								printf("Error: cell already contains a value\n");
-							else
-							{
-								/*run ILP and get...*/
-								fullBoard = copyBoard(userBoard);
-								solved = ilpSolve(fullBoard);
-								if (solved==0)
-									printf("Error: board is unsolvable\n");
-								else
-									hint(fullBoard,y-1,x-1);
-								/*free the solved board's memory*/
-								destroyBoard(fullBoard);
-							}
-						}
+					doHint(userBoard, string[1],string[2]);
 					}
 
 				else if (strcmp(string[0],"validate")==0 && solved!=2 && (mode==1 || mode==2))/*available in solve or edit*/
