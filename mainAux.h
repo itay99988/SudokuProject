@@ -9,7 +9,7 @@ void doNumSolutions(Board* board);
 void doAutoFill(Board* board, List* undoList, int* mode);
 void doGenerate(Board* userBoard, List* undoList, char* first, char* second);
 void doHint(Board* userBoard, char* first,char* second);
-void doMarkErrors(Board* userBoard, char* first);
+void doMarkErrors(Board* userBoard, char* first, int* lastBoardMarkErrors);
 void doSet(Board* userBoard, List* undoList, char* first,char* second, char* third, int* mode);
 void doUndo(Board* board, List* undoList, int printVal, int* mode);
 void setOptions(Board *board, int row, int column);

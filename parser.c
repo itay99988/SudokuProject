@@ -31,7 +31,7 @@ int isInt(char* string);
 void read()
 {
 	/* Game mode: 0 - Init, 1 - Solve, 2 - Edit */
-	int mode = 0, i = 0; /* mode - starts in Init mode */
+	int mode = 0, i = 0, currentMarkErrors = 1; /* mode - starts in Init mode */
 	char input[256], *string[256], delimiters[] = " \t\r\n";
 	List* undoList = NULL;
 	Board* userBoard = NULL;
@@ -61,11 +61,11 @@ void read()
 			else if (strcmp(string[0],"reset")==0 && (mode==1 || mode==2))/*available in solve or edit*/
 				{ reset(userBoard,&undoList); }
 			else if (strcmp(string[0],"solve")==0 && string[1]!=NULL) /*available in every mode*/
-				{ doSolve(string[1], &userBoard, &undoList, &mode, (userBoard ? userBoard->markErrors : 1)); }
+				{ doSolve(string[1], &userBoard, &undoList, &mode, currentMarkErrors); }
 			else if (strcmp(string[0],"edit")==0) /*available in every mode*/
 				{ doEdit(string[1],&userBoard, &undoList, &mode); }
 			else if (strcmp(string[0],"mark_errors")==0 && string[1]!=NULL && mode==1) /*available only in solve*/
-				{ doMarkErrors(userBoard, string[1]); }
+				{ doMarkErrors(userBoard, string[1], &currentMarkErrors); }
 			else if (strcmp(string[0],"print_board")==0 && (mode==1 || mode==2)) /*available in solve or edit*/
 				{ printBoard(userBoard); }
 			else if (strcmp(string[0],"generate")==0 && string[1]!=NULL && isInt(string[1]) && string[2]!=NULL && isInt(string[2]) && mode==2) /*available only in edit*/

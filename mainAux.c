@@ -241,11 +241,12 @@ void doSet(Board* userBoard, List* undoList, char* first, char* second,char* thi
 	}
 }
 
-void doMarkErrors(Board* userBoard, char* first){
+void doMarkErrors(Board* userBoard, char* first, int* lastBoardMarkErrors){
 	/* implement mark errors*/
 	if (strcmp(first,"1")==0 || strcmp(first,"0")==0)
 	{
 		userBoard ->markErrors = atoi(first);
+		(*lastBoardMarkErrors) = atoi(first);
 	}
 	else
 		printf("Error: the value should be 0 or 1\n");
