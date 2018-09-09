@@ -51,7 +51,7 @@ int save (Board* board, char *path, int gameMode)
 
 int load (char *path, Board** board, int mode)
 {
-	int size, i, j, m, n;
+	int size, i=0, j=0, m, n, firstCycle=1;
 	FILE *f = fopen(path, "r");
     char line[1024];
     char * data;
@@ -70,43 +70,52 @@ int load (char *path, Board** board, int mode)
 	{
 		if(fgets(line, sizeof line, f) != NULL)
 		{
-			m = (strtok(line,delimiters))[0] - '0';
-			n = (strtok(line,delimiters))[2] - '0';
+			m = (strtok(line,delimiters))[0]-'0';
+			n = (strtok(NULL,delimiters))[0]-'0';
+			/*printf("m=%d, n=%d\n",m,n);*/
 			size = m*n;
 			*board = init(n,m);
-		}
 
-		for (i=0; i<size;i++)
-		{
-			if(fgets(line, sizeof line, f) != NULL)
-			{
+			do {
 				/*printf("%s\n",line);*/
-		    	/*need to get the values from the line*/
-				data = strtok(line,delimiters);
-		    	for (j=0; j<size;j++)
-		    	{
+				/*need to get the values from the line*/
+				/* skip the m and n parameters if this is the first line */
+				if (firstCycle)
+				{
+					data = strtok(NULL,delimiters);
+					firstCycle = 0;
+				}
+				else
+					data = strtok(line,delimiters);
 
-		    		/*printf("%s ",data);*/
-		    		if (data[strlen(data)-1] == '.')
-		    		{
-		    			if(mode==1)
-		    				(*board)->cells[i][j].fixed = 1;
-		    			else /*mode==2*/
-		    				(*board)->cells[i][j].fixed = 0;
-		    			data[strlen(data)-1] = '\0';
-		    		}
+				while ((i+1)*(j+1)<=size*size && data!=NULL)
+				{
+					/*printf("%s ",data);*/
+					if (data[strlen(data)-1] == '.')
+					{
+						if(mode==1)
+							(*board)->cells[i][j].fixed = 1;
+						else /*mode==2*/
+							(*board)->cells[i][j].fixed = 0;
+						data[strlen(data)-1] = '\0';
+					}
 
-		    		(*board)->cells[i][j].value = atoi(data);
-		    		/*printf("\n");*/
-		    		data = strtok(NULL,delimiters);
-		    	}
-			}
-	    }
+					(*board)->cells[i][j].value = atoi(data);
+					/*printf("\n");*/
 
-		markAllBoardErrors(*board);
-		fclose(f);
-		return 1;
+					data = strtok(NULL,delimiters);
+					if (j<size-1)
+					{ j++; }
+					else
+					{ i++; j=0; }
+				}
+			}  while(fgets(line, sizeof line, f) != NULL);
+		}
 	}
+
+	markAllBoardErrors(*board);
+	fclose(f);
+	return 1;
 }
 
 /* End of public methods */
