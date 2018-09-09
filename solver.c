@@ -65,7 +65,7 @@ int isValid(Board *board, int row, int column, int value)
  *  This function gets the actual user board, makes a copy of it and then runs ILP on the copy
  *  in order if the board is solvable.
  *  @param board - the actual game board (not a copy of it)
- *  @return -1 if solveable, 0 if not.
+ *  @return - 1 if solveable, 0 if not.
  */
 int validate(Board* board){
 	Board* boardCopy = copyBoard(board);

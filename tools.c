@@ -1,6 +1,7 @@
 /*
  * Tools Module
  *
+ *  This module is in charge of reading from files and writing to files. has save and load methods.
  */
 
 #include <stdio.h>
@@ -11,6 +12,18 @@
 #include "solver.h"
 
 /* Public methods: */
+
+/*
+ * save
+ *
+ *  This function gets the game board and a path and saves if possible.
+ *
+ *  @param board - the actual game board
+ *  @param path - a string of the path
+ *  @param gameMode - current game mode
+ *  @return - 1 if save succeeded, 0 if not.
+ */
+
 int save (Board* board, char *path, int gameMode)
 {
 	int i, j;
@@ -22,7 +35,6 @@ int save (Board* board, char *path, int gameMode)
 
 	if (f == NULL)
 	{
-		/* printf("Error opening file!\n"); what should we do???*/
 		printf("Error: File cannot be created or modified\n");
 		return 0;
 	}
@@ -34,7 +46,8 @@ int save (Board* board, char *path, int gameMode)
 			for(j=0;j<size;j++)
 			{
 				fprintf(f,"%d",board->cells[i][j].value);
-				if (board->cells[i][j].fixed==1 || (gameMode==2 && board->cells[i][j].value!=0)) /*this is how we implement h*/
+				/* prints '.' for fixed cells - if edit mode - fix the values */
+				if (board->cells[i][j].fixed==1 || (gameMode==2 && board->cells[i][j].value!=0))
 					fprintf(f,".");
 				else
 					fprintf(f," ");
@@ -49,17 +62,24 @@ int save (Board* board, char *path, int gameMode)
 
 }
 
+/*
+ * load
+ *
+ *  This function gets a path and loads a board from this path if possible.
+ *
+ *  @param board - a pointer to a board
+ *  @param path - a string of the path
+ *  @param mode - current game mode
+ *  @return - 1 if save succeeded, 0 if not.
+ */
 int load (char *path, Board** board, int mode)
 {
 	int size, i=0, j=0, m, n, firstCycle=1;
 	FILE *f = fopen(path, "r");
     char line[1024];
     char * data;
-
     char delimiters[] = " \t\r\n";
-
-    i = 0;
-    j = 0;
+    i = 0, j = 0;
 
 	if (f == NULL)
 	{
@@ -68,8 +88,9 @@ int load (char *path, Board** board, int mode)
 	}
 	else
 	{
-		if(fgets(line, sizeof line, f) != NULL)
+		if(fgets(line, sizeof line, f) != NULL) /* reads from file line by line */
 		{
+			/* first - initiate the board according to the size */
 			m = (strtok(line,delimiters))[0]-'0';
 			n = (strtok(NULL,delimiters))[0]-'0';
 			/*printf("m=%d, n=%d\n",m,n);*/
@@ -93,9 +114,9 @@ int load (char *path, Board** board, int mode)
 					/*printf("%s ",data);*/
 					if (data[strlen(data)-1] == '.')
 					{
-						if(mode==1)
+						if(mode==1) /*solve MODE*/
 							(*board)->cells[i][j].fixed = 1;
-						else /*mode==2*/
+						else /*mode==2 ---> EDIT MODE*/
 							(*board)->cells[i][j].fixed = 0;
 						data[strlen(data)-1] = '\0';
 					}
@@ -103,7 +124,8 @@ int load (char *path, Board** board, int mode)
 					(*board)->cells[i][j].value = atoi(data);
 					/*printf("\n");*/
 
-					data = strtok(NULL,delimiters);
+					data = strtok(NULL,delimiters); /*skip a delimiter*/
+					/* instead of for loop, calculate the i,j values "handly" */
 					if (j<size-1)
 					{ j++; }
 					else
@@ -113,6 +135,7 @@ int load (char *path, Board** board, int mode)
 		}
 	}
 
+	/* mark errors in the board */
 	markAllBoardErrors(*board);
 	fclose(f);
 	return 1;

@@ -3,6 +3,7 @@
  *
  *  This module is in charge of auxilary functions in the project.
  *  The functions here maniplute data, manage memory and are in charge of printing
+ *  every command has a doCommand which validate the data and call the command method (which in the game module)
  */
 
 #include <stdio.h>
@@ -28,13 +29,23 @@ int isInt(char* string);
 
 /* Public methods: */
 
+/*
+ * doSave
+ *
+ *  This function call the save method if we are in solve mode, otherwise, we are in edit mode and we validate the board
+ *  if validated - being saved
+ *  @param userBoard - the user's board
+ *  @param path - a pointer to the desired path
+ *  @param mode - the current game mode
+ *  @return -
+ */
 void doSave(Board* userBoard, char *path, int mode)
 {
-	if (mode==1)
+	if (mode==1) /* solve mode */
 	{
 		save(userBoard, path, mode);
 	}
-	else /*mode==2*/
+	else /* mode==2 ---> edit mode */
 	{
 		if(isThereAnError(userBoard))
 			printf("Error:board contains erroneous values\n");
@@ -42,11 +53,20 @@ void doSave(Board* userBoard, char *path, int mode)
 				save(userBoard, path, mode);
 			else
 				printf("Error: board validation failed\n");
-			/*markAsFixed(userBoard); implement I - check if this is the acctual need*/
 	}
 }
 
-
+/*
+ * doSolve
+ *
+ *  This function validate the path it gets, and init the board from the file respectively
+ *  @param path - a pointer to the desired path
+ *  @param userBoard - the user's board
+ *  @param list - the doubly linked list which stores the moves
+ *  @param mode - the current game mode
+ *  @param currentMarkErrors - the current mark errors field
+ *  @return -
+ */
 void doSolve(char *path, Board** userBoard, List** undoList,int* mode, int currentMarkErrors)
 {
 	FILE* fp;
@@ -65,15 +85,23 @@ void doSolve(char *path, Board** userBoard, List** undoList,int* mode, int curre
 		(*userBoard)->markErrors = currentMarkErrors;
 		printBoard(*userBoard);
 	}
-
 	fclose(fp);
-
 }
 
+/*
+ * doEdit
+ *
+ *  This function validate the path it gets, and init the board from the file respectively
+ *  @param path - a pointer to the desired path
+ *  @param userBoard - the user's board
+ *  @param list - the doubly linked list which stores the moves
+ *  @param mode - the current game mode
+ *  @return -
+ */
 void doEdit(char *path,Board** userBoard, List** undoList, int* mode)
 {
 	FILE* fp;
-	if (path!=NULL) /*there is a parameter*/
+	if (path!=NULL) /*check if there is a parameter*/
 	{
 		fp = fopen(path, "r");
 		if (fp==NULL)
@@ -93,12 +121,12 @@ void doEdit(char *path,Board** userBoard, List** undoList, int* mode)
 		}
 		fclose(fp);
 	}
-	else
+	else /* there isn't a parameter - initalize an empty board */
 	{
 		destroyBoard(*userBoard);
 		(*mode) = 2; /* start a puzzle in edit mode */
 		/* need to initilalize an empty board */
-		*userBoard = init(3,3); /* initiate 3*3 - maybe change it to a DEFINE or something */
+		*userBoard = init(3,3); /* initiate 3*3 - maybe change it to a DEFINE or something REPLACE*/
 		(*userBoard)->markErrors = 1;/* mark errors parameter is 1 */
 		destroyList(*undoList);
 		*undoList = initList();
@@ -106,9 +134,16 @@ void doEdit(char *path,Board** userBoard, List** undoList, int* mode)
 	}
 }
 
+/*
+ * doValidate
+ *
+ *  This function validates the board and prints message respectively
+ *  @param userBoard - the user's board
+ *  @return -
+ */
 void doValidate(Board* userBoard)
 {
-	if(isThereAnError(userBoard))
+	if(isThereAnError(userBoard)) /*check whether there is an erroneous value in the board*/
 		printf("Error: board contains erroneous values\n");
 	else{
 		if(validate(userBoard))
@@ -118,6 +153,13 @@ void doValidate(Board* userBoard)
 	}
 }
 
+/*
+ * doNumSolutions
+ *
+ *  This function validates whether the board is erroneous or not, if not - gets the number of solutions and prints it
+ *  @param userBoard - the user's board
+ *  @return -
+ */
 void doNumSolutions(Board* userBoard){
 
 	int numSolutions;
@@ -128,7 +170,6 @@ void doNumSolutions(Board* userBoard){
 		numSolutions=getNumSolutions(userBoard);
 		printf("Number of solutions: %d\n", numSolutions);
 
-
 		if(numSolutions==1)
 			printf("This is a good board!\n");
 		else if(numSolutions>1)
@@ -136,6 +177,15 @@ void doNumSolutions(Board* userBoard){
 	}
 }
 
+/*
+ * doAutoFill
+ *
+ *  This function validates whether the board is erroneous or not, if not - autofill it and check if the board is solved
+ *  @param userBoard - the user's board
+ *  @param list - the doubly linked list which stores the moves
+ *  @param mode - the current game mode
+ *  @return -
+ */
 void doAutoFill(Board* userBoard, List* undoList, int* mode){
 	if(isThereAnError(userBoard))
 		printf("Error: board contains erroneous values\n");
@@ -144,6 +194,7 @@ void doAutoFill(Board* userBoard, List* undoList, int* mode){
 		autoFill(userBoard,undoList);
 		printBoard(userBoard);
 
+		/* autofill may solve the board - therefore need to check it and update the game mode respectively*/
 		if(isBoardFull(userBoard))
 		{
 			if (isThereAnError(userBoard))
@@ -151,12 +202,22 @@ void doAutoFill(Board* userBoard, List* undoList, int* mode){
 			else
 			{
 				printf("Puzzle solved successfully\n");
-				(*mode) = 0;
+				(*mode) = 0; /*game is solved, move to INIT mode*/
 			}
 		}
 	}
 }
 
+/*
+ * doGenerate
+ *
+ *  This function validates the user's input for generate, and call generate or prints error respectively
+ *  @param userBoard - the user's board
+ *  @param list - the doubly linked list which stores the moves
+ *  @param first - the first field the user sent to the command
+ *  @param second - the second field the user sent to the command
+ *  @return -
+ */
 void doGenerate(Board* userBoard, List* undoList, char* first, char* second){
 	int result,x,y,boardsize, numberOfCells;
 
@@ -165,9 +226,9 @@ void doGenerate(Board* userBoard, List* undoList, char* first, char* second){
 	boardsize = userBoard->boardsize;
 	numberOfCells = boardsize*boardsize;
 
-	if (!isInt(first) || !isInt(second))
+	if (!isInt(first) || !isInt(second)) /* x and y are integers */
 		printf("Error: value not in range 0-%d\n",numberOfCells);
-	else if (!((x>=0 && x<=numberOfCells) && (y>=0 && y<=numberOfCells)))
+	else if (!((x>=0 && x<=numberOfCells) && (y>=0 && y<=numberOfCells))) /* x and y between 0 and number of cells */
 		printf("Error: value not in range 0-%d\n",numberOfCells);
 	else
 	{
@@ -185,18 +246,27 @@ void doGenerate(Board* userBoard, List* undoList, char* first, char* second){
 
 }
 
+/*
+ * doHint
+ *
+ *  This function validates the user's input for hint, and call hint or prints error respectively
+ *  @param userBoard - the user's board
+ *  @param first - the first field the user sent to the command
+ *  @param second - the second field the user sent to the command
+ *  @return -
+ */
 void doHint(Board* userBoard, char* first,char* second){
 	int x,y,boardsize, solved;
 	Board* fullBoard;
 	x = atoi(first);
 	y = atoi(second);
-	boardsize = userBoard->boardsize; /*do we need it??/*/
+	boardsize = userBoard->boardsize;
 
-	if (!isInt(first) || !isInt(second))
+	if (!isInt(first) || !isInt(second)) /* x and y are integers */
 		printf("Error: value not in range 1-%d\n",boardsize);
-	else if((x==0 && strcmp(first,"0")!=0)||(y==0 && strcmp(second,"0")!=0))
+	else if((x==0 && strcmp(first,"0")!=0)||(y==0 && strcmp(second,"0")!=0)) /* x and y are integers */
 			printf("Error: value not in range 1-%d\n",boardsize);
-	else if (!((x>=1 && x<=boardsize) && (y>=1 && y<=boardsize)))
+	else if (!((x>=1 && x<=boardsize) && (y>=1 && y<=boardsize))) /* x and y between 1 and number of cells */
 		printf("Error: value not in range 1-%d\n",boardsize);
 	else if (isThereAnError(userBoard)){
 		printf("Error: board contains erroneous values\n");
@@ -209,7 +279,7 @@ void doHint(Board* userBoard, char* first,char* second){
 			printf("Error: cell already contains a value\n");
 		else
 		{
-			/*run ILP and get...*/
+			/*run ILP and get a solved board*/
 			fullBoard = copyBoard(userBoard);
 			solved = ilpSolve(fullBoard);
 			if (solved==0)
@@ -223,6 +293,18 @@ void doHint(Board* userBoard, char* first,char* second){
 
 }
 
+/*
+ * doSet
+ *
+ *  This function validates the user's input for set, and call set or prints error respectively
+ *  @param userBoard - the user's board
+ *  @param list - the doubly linked list which stores the moves
+ *  @param first - the first field the user sent to the command
+ *  @param second - the second field the user sent to the command
+ *  @param third - the third field the user sent to the command
+ *  @param mode- the current game mode
+ *  @return -
+ */
 void doSet(Board* userBoard, List* undoList, char* first, char* second,char* third, int* mode){
 	int x,y,z, boardsize, solved;
 	x = atoi(first);
@@ -230,18 +312,19 @@ void doSet(Board* userBoard, List* undoList, char* first, char* second,char* thi
 	z = atoi(third);
 	boardsize = (userBoard)->boardsize;
 
-	if (!isInt(first) || !isInt(second) || !isInt(third))
+	if (!isInt(first) || !isInt(second) || !isInt(third)) /* x,y and z are integers */
 		printf("Error: value not in range 0-%d\n",boardsize);
 	else if((x==0 && strcmp(first,"0")!=0)||(y==0 && strcmp(second,"0")!=0)||(z==0 && strcmp(third,"0")!=0))
 		printf("Error: value not in range 0-%d\n",boardsize);
-	else if (!((x>=1 && x<=boardsize) && (y>=1 && y<=boardsize)))
+	else if (!((x>=1 && x<=boardsize) && (y>=1 && y<=boardsize))) /* x and y are between 1 and board size */
 		printf("Error: value not in range 1-%d\n",boardsize);
-	else if (!(z>=0 && z<=boardsize))
+	else if (!(z>=0 && z<=boardsize)) /* z is between 0 and board size */
 		printf("Error: value not in range 0-%d\n",boardsize);
 	else
 	{
 		solved = set(userBoard, undoList ,y-1,x-1,z, *mode);
 
+		/* if the board is solved, change to INIT mode */
 		if (solved == 2)
 		{
 			(*mode) = 0;
@@ -249,9 +332,17 @@ void doSet(Board* userBoard, List* undoList, char* first, char* second,char* thi
 	}
 }
 
+/*
+ * doMarkErrors
+ *
+ *  This function validates the user's input for markErrors, and call markErrors or prints error respectively
+ *  @param userBoard - the user's board
+ *  @param first - the first field the user sent to the command
+ *  @param lastBoardMarkErrors - the last board markErrors value
+ *  @return -
+ */
 void doMarkErrors(Board* userBoard, char* first, int* lastBoardMarkErrors){
-	/* implement mark errors*/
-	if (strcmp(first,"1")==0 || strcmp(first,"0")==0)
+	if (strcmp(first,"1")==0 || strcmp(first,"0")==0) /* field can be only 0 or 1 */
 	{
 		userBoard ->markErrors = atoi(first);
 		(*lastBoardMarkErrors) = atoi(first);
@@ -260,6 +351,16 @@ void doMarkErrors(Board* userBoard, char* first, int* lastBoardMarkErrors){
 		printf("Error: the value should be 0 or 1\n");
 }
 
+/*
+ * doUndo
+ *
+ *  This function call undo method, and prints respective message if the board solutions erroneous
+ *  @param userBoard - the user's board
+ *  @param list - the doubly linked list which stores the moves
+ *  @param printVal - whether print or not the undone moves
+ *  @param mode - the current game mode
+ *  @return -
+ */
 void doUndo(Board* board, List* undoList, int printVal, int* mode){
 	undo(board,undoList,printVal);
 
@@ -340,7 +441,6 @@ void destroyBoard(Board *currentBoard)
  *
  *  This function completely copies existing board to a new location in memory
  *  @param currentBoard - pointer to board
- *  @param size - size of board
  *  @return - pointer to the new board
  */
 Board* copyBoard(Board *currentBoard)
@@ -403,10 +503,8 @@ Board* copyBoard(Board *currentBoard)
  *
  *  This function resets all values of a exisiting board to its default values.
  *  @param board - pointer to board
- *  @param size - size of board
  *  @return -
  */
-
 void resetBoard(Board *board)
 {
 	int k,l,size;
@@ -425,6 +523,13 @@ void resetBoard(Board *board)
 	}
 }
 
+/*
+ * isBoardFull
+ *
+ *  This function check whether all cells in the board contains value
+ *  @param currentBoard - pointer to board
+ *  @return 1 - all cells contains values (not 0!!!), 0 - otherwise
+ */
 int isBoardFull(Board *currentBoard)
 {
 	int i, j;
@@ -438,6 +543,13 @@ int isBoardFull(Board *currentBoard)
 	return 1;
 }
 
+/*
+ * isBoardEmpty
+ *
+ *  This function check whether all cells in the board do not contains value
+ *  @param currentBoard - pointer to board
+ *  @return 1 - board is empty, 0 - otherwise
+ */
 int isBoardEmpty(Board *currentBoard)
 {
 	int i, j;
@@ -496,7 +608,7 @@ void resetOption(int *options, int size)
 	}
 }
 
-/* not in use right now. did you want to use it? */
+/* not in use right now. did you want to use it? REPLACE */
 void markAsFixed(Board *currentBoard){
 	int i, j;
 	int size = currentBoard->boardsize;
@@ -507,7 +619,7 @@ void markAsFixed(Board *currentBoard){
 				currentBoard->cells[i][j].fixed=1;
 }
 
-/* not in use right now. did you want to use it? */
+/* not in use right now. did you want to use it? REPLACE*/
 void clearFixed(Board *currentBoard){
 	int i, j;
 	int size = currentBoard->boardsize;
@@ -579,6 +691,13 @@ void removeOption(int *options, int index, int boardsize)
 
 /* Private methods: */
 
+/*
+ * isInt
+ *
+ *  This function gets a string and check whether all his chars are integers
+ *  @param string - a string
+ *  @return 1 - all chars are integers, 0 - otherwise
+ */
 int isInt(char *string)
 {
         int i, stringLength = strlen(string);

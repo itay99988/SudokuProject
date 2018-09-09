@@ -15,18 +15,14 @@
 #include "solver.h"
 #include "parser.h"
 
-/* Private methods declaration */
-/*static char digitToChar(int c);*/
-
-
 /* Public methods: */
 
 /*
  * init
  *
  *  This function initializes a board with default values
- *  @param size - size of board
- *  @return -
+ *  @param n,m - n,m fields of the board
+ *  @return - Board* - the initiate Board
  */
 Board* init(int n, int m){
 	Cell **board;
@@ -95,7 +91,7 @@ Board* init(int n, int m){
  * printBoard
  *
  *  This function prints the current status of the sudoku board, according to the desired format
- *  0 counts as empty cell. dot addition represents fixed cell
+ *  0 counts as empty cell, dot addition represents fixed cell, asterisk addition represents erroneous cell
  *  @param board - the solved board
  *  @return -
  */
@@ -106,7 +102,7 @@ void printBoard(Board *board)
 	int n,m,N;
 	char specialSign;
 
-	/*definitions of dimentions: */
+	/*definitions of dimensions: */
 	n=board->n, m=board->m, N=board->boardsize;
 	for (i=0; i<N; i++)
 	{
@@ -123,9 +119,6 @@ void printBoard(Board *board)
 				printf("|");
 
 			printf(" ");
-
-			/*
-			printf(" %d",*((board+i*size)+j));*/
 
 			if (board->cells[i][j].fixed==1)
 				specialSign = '.';
@@ -153,10 +146,12 @@ void printBoard(Board *board)
  *
  *  This function gets partially solved board, and sets a value in the desired location, if possible
  *  @param board - the user's board
+ *  @param list - the doubly linked list which stores the moves
  *  @param x - column number
  *  @param y - row number
  *  @param z - value
- *  @return - 0 if set has failed. 1 if set has succeeded. 2 if puzzle is solved. 3 if puzzle solution erroneous
+ *  @param gameMode - the current mode of the game
+ *  @return - 0 if set has failed. 1 if set has succeeded. 2 if puzzle is solved successfully.
  */
 int set(Board *board, List *undoList, int x, int y, int z, int gameMode)
 {
@@ -206,12 +201,11 @@ int set(Board *board, List *undoList, int x, int y, int z, int gameMode)
 /*
  * hint
  *
- *  This function gets solved board, and gives a hint to the user for a specific location (based on the stored solution
- *  )
- *  @param board - the user's board
+ *  This function gets solved board, and prints a hint to the user for a specific location (based on the stored solution)
+ *  @param solvedBoard - a solve board, according to the user's board
  *  @param x - column number
  *  @param y - row number
- *  @return - always 1
+ *  @return -
  */
 void hint(Board *solvedBoard, int x, int y)
 {
@@ -226,6 +220,7 @@ void hint(Board *solvedBoard, int x, int y)
  *  @param board - pointer to the game board
  *  @param undoList - the doubly linked list which stores the moves
  *  @param printVal - whether of not the function print its actions
+ *  @param mode - a pointer to the current game mode
  *  @return -
  */
 void redo(Board* board, List* undoList, int printVal, int* mode)
@@ -328,6 +323,14 @@ void undo(Board* board, List* undoList, int printVal)
 	}
 }
 
+/*
+ * reset
+ *
+ *  This function reset the game board to his first stage, meaning undo all the moves that were done by the user
+ *  @param userBoard - the user's board
+ *  @param undoList - a pointer to the doubly linked list which stores the moves
+ *  @return -
+ */
 void reset(Board* board, List** undoList){
 	while((*undoList)->current->prev != NULL){
 		undo(board,*undoList,0);
@@ -343,8 +346,7 @@ void reset(Board* board, List** undoList){
  *
  *  This function free all memory block and quits.
  *  @param userBoard - the user's board
- *  @param generatedBoard - a possible stored solution
- *  @param size - boards size
+ *  @param undoList - the doubly linked list which stores the moves
  *  @return -
  */
 void exitGame(Board *userBoard, List *undoList)
@@ -361,8 +363,7 @@ void exitGame(Board *userBoard, List *undoList)
  * startGame
  *
  *  This function will initialize the sudoku game for the first time
- *  builds both boards, gets number of fixed cells from user and makes the desired manipulations
- *  on the user's board before the game begins. also, it prints the board's initial status.
+ *  prints the desired "line" and call the read function
  *  @return -
  */
 void startGame()
@@ -370,17 +371,5 @@ void startGame()
 	printf("Sudoku\n------\n");
 	read();
 }
+
 /* End of public methods */
-
-
-/* Private methods: */
-/*
-static char digitToChar(int c)
-{
-	if(c==0)
-		return '_';
-	else
-		return c + '0';
-}
-*/
-/* End of private methods */

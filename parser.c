@@ -1,7 +1,7 @@
 /*
  * Parser Module
  *
- *  This module is in charge of writing and reading the commands. it has two functions - initialization and read
+ *  This module is in charge of reading the commands and call theright methods.
  */
 
 #include <stdio.h>
@@ -15,48 +15,21 @@
 #include "mainAux.h"
 #include "ILPSolver.h"
 
+/* private methods declaration: */
+int getACommand(char* input);
+
 /* Public methods: */
-
-/* 0 for error, 1 for good, 2 for EOF*/
-int getACommand(char* input){
-	int i=0;
-	char ch;
-
-	while((ch=fgetc(stdin)) != '\n')
-	{
-		if(i>256)
-		{
-			while((ch = fgetc(stdin)) != '\n' && ch != EOF); /* Flush buffer */
-			return 0;
-		}
-
-		if (ch==EOF)
-			return 2; /*2 for exit*/
-
-		input[i]=ch;
-		i++;
-	}
-	input[i]='\0';
-	/*
-	do{
-
-	}while (isEmpty(input));*/
-	return 1;
-}
 
 /*
  * read
  *
- *  This function reads the user's game-plays and interpret them - calls the right function in game
- *  @param generatedBoard - a possible stored solution
- *  @param userBoard - the user's board
+ *  This function reads the user's game-plays and interpret them - calls the right doFunction in mainAux
  *  @return -
  */
 void read()
-{
+{ /*REPLACE - document!!!*/
 	/* Game mode: 0 - Init, 1 - Solve, 2 - Edit */
 	int mode = 0, i = 0, currentMarkErrors = 1, inputValidation; /* mode - starts in Init mode */
-	/*char input[2048], *string[256], */
 	char input[256] = {'\0'}, *string[256],delimiters[] = " \t\r\n";
 	List* undoList = NULL;
 	Board* userBoard = NULL;
@@ -78,10 +51,8 @@ void read()
 	while(1)
 	{
 		if(string[0]!='\0' && inputValidation){
-			/*if ((strcmp(string[0],"set")==0) && string[1]!=NULL && isInt(string[1]) && string[2]!=NULL && isInt(string[2]) && string[3]!=NULL && isInt(string[3]) && (mode==1 || mode==2))*/ /*available in solve or edit*/
 			if ((strcmp(string[0],"set")==0) && string[1]!=NULL && string[2]!=NULL && string[3]!=NULL && (mode==1 || mode==2)) /*available in solve or edit*/
 				{ doSet(userBoard,undoList, string[1], string[2], string[3],&mode); }
-			/*else if (strcmp(string[0],"hint")==0 && string[1]!=NULL && isInt(string[1]) && string[2]!=NULL && isInt(string[2]) && mode==1)*/ /*available only in solve*/
 			else if (strcmp(string[0],"hint")==0 && string[1]!=NULL && string[2]!=NULL && mode==1) /*available only in solve*/
 				{ doHint(userBoard, string[1],string[2]); }
 			else if (strcmp(string[0],"validate")==0 && (mode==1 || mode==2))/*available in solve or edit*/
@@ -116,6 +87,7 @@ void read()
 		}
 		else { printf("Enter your command:\n"); }
 
+		/* just re-initial the input with invalid chars\commands */
 		for (i=0;i<256;i++)
 			input[i]='!';
 
@@ -137,3 +109,35 @@ void read()
 }
 
 /* End of public methods */
+
+
+/* Private methods: */
+
+/*
+ * getACommand
+ *
+ *  This function reads char by char input from the user and insert it to its input.
+ *  @param input - a string
+ *  @return - 0 for error, 1 for good, 2 for EOF
+ */
+int getACommand(char* input){
+	int i=0;
+	char ch;
+
+	while((ch=fgetc(stdin)) != '\n')
+	{
+		if(i>256) /* REPLACE the magic number */
+		{
+			while((ch = fgetc(stdin)) != '\n' && ch != EOF); /* skipping every char after 256 chars */
+			return 0;
+		}
+
+		if (ch==EOF)
+			return 2; /*2 for exit*/
+
+		input[i]=ch;
+		i++;
+	}
+	input[i]='\0';
+	return 1;
+}

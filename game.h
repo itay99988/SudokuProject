@@ -1,12 +1,18 @@
-
 #ifndef GAME_H_
 #define GAME_H_
+
+/*
+ * Game Module
+ *
+ *  This module is in charge of game-play. every function which is related to
+ *  a specific operation/stage in the game is here. (such as initialize board, set,hint,validate etc)
+ */
 
 #include "undoList.h"
 
 /* ---The cell struct--
  * this struct is used for describing a specific sudoku cell
- * contains the follwing:
+ * contains the following:
  * -value field
  * -fixed field
  * -error value
@@ -27,6 +33,7 @@ typedef struct cell{
  * -game cells
  * -n,m parameters
  * -the boardsize parameter (n*m)
+ * markErrors field (1=mark, 0=do not mark)
  */
 typedef struct board{
 	Cell **cells;
