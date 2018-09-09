@@ -28,27 +28,31 @@
 void read()
 {
 	/* Game mode: 0 - Init, 1 - Solve, 2 - Edit */
-	int mode = 0, i = 0, currentMarkErrors = 1; /* mode - starts in Init mode */
-	char input[256], *string[256], delimiters[] = " \t\r\n";
+	int mode = 0, i = 0, currentMarkErrors = 1, isCommandValid=1; /* mode - starts in Init mode */
+	char input[2048], *string[256], delimiters[] = " \t\r\n";
 	List* undoList = NULL;
 	Board* userBoard = NULL;
+	input[256] = 'y'; input[257] = '@'; input[258] = 't'; input[259]='a'; input[260]='m';
 	/*const int initialBoardDimension = 3;  according to the forum  is 3*3 - want to change it to define???, was moved to game.c*/
 	printf("Enter your command:\n");
 	if(fgets(input, sizeof input, stdin)!=NULL) {
-		string[i]=strtok(input,delimiters);
-		while(string[i]!=NULL)
-		{
-		  /*printf("string [%d]=%s\n",i,string[i]);*/
-		  i++;
-		  string[i]=strtok(NULL,delimiters);
+		if (input[256]=='y' && input[257]=='@' && input[258]=='t' && input[259]=='a' && input[260]=='m'){
+			string[i]=strtok(input,delimiters);
+			while(string[i]!=NULL){
+			  i++;
+			  string[i]=strtok(NULL,delimiters);
+			}
+		}
+		else{
+			printf("Error: invalid command\n");
+			isCommandValid = 0;
 		}
 	}
 	else { exit(0); /*GOT EOF, therefore exits*/ }
 
 	while(1)
 	{
-		if(string[0]!='\0')
-		{
+		if(string[0]!='\0' && isCommandValid){
 			/*if ((strcmp(string[0],"set")==0) && string[1]!=NULL && isInt(string[1]) && string[2]!=NULL && isInt(string[2]) && string[3]!=NULL && isInt(string[3]) && (mode==1 || mode==2))*/ /*available in solve or edit*/
 			if ((strcmp(string[0],"set")==0) && string[1]!=NULL && string[2]!=NULL && string[3]!=NULL && (mode==1 || mode==2)) /*available in solve or edit*/
 				{ doSet(userBoard,undoList, string[1], string[2], string[3],&mode); }
@@ -87,14 +91,18 @@ void read()
 		}
 		else { printf("Enter your command:\n"); }
 
-		i=0;
-		if(fgets(input, sizeof input, stdin)!=NULL)
-		{
-			string[i]=strtok(input,delimiters);
-			while(string[i]!=NULL)
-			{
-			  i++;
-			  string[i]=strtok(NULL,delimiters);
+		i=0; input[256] = 'y'; input[257] = '@'; input[258] = 't'; input[259]='a'; input[260]='m'; isCommandValid = 1;
+		if(fgets(input, sizeof input, stdin)!=NULL){
+			if (input[256]=='y' && input[257]=='@' && input[258]=='t' && input[259]=='a' && input[260]=='m'){
+				string[i]=strtok(input,delimiters);
+				while(string[i]!=NULL){
+				  i++;
+				  string[i]=strtok(NULL,delimiters);
+				}
+			}
+			else{
+				printf("Error: invalid command\n");
+				isCommandValid = 0;
 			}
 		}
 		else{ exitGame(userBoard, undoList); /*GOT EOF, therefore exits*/ }
