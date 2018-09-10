@@ -112,7 +112,7 @@ void doEdit(char *path,Board** userBoard, List** undoList, int* mode)
 		{
 			(*mode) = 2; /* start a puzzle in edit mode */
 			destroyBoard(*userBoard);
-			load(path,userBoard,*mode)
+			load(path,userBoard,*mode);
 			(*userBoard)->markErrors = 1;/* mark errors parameter is 1 */
 			destroyList(*undoList);
 			*undoList = initList();
