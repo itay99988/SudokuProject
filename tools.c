@@ -83,7 +83,7 @@ int load (char *path, Board** board, int mode)
 
 	if (f == NULL)
 	{
-	    printf("Error opening file!\n");
+	    printf("Error: File doesn't exist or cannot be opened!\n");
 	    return 0;
 	}
 	else
