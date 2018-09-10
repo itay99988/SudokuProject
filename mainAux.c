@@ -84,8 +84,8 @@ void doSolve(char *path, Board** userBoard, List** undoList,int* mode, int curre
 		(*undoList) = initList();
 		(*userBoard)->markErrors = currentMarkErrors;
 		printBoard(*userBoard);
+		fclose(fp);
 	}
-	fclose(fp);
 }
 
 /*
