@@ -178,6 +178,17 @@ int generate(Board* userBoard, List *undoList, int x, int y){
 	return 1;
 }
 
+/*
+ * autoFill
+ *
+ *  This function gets the gameboard and the undoList, go over each cell and checks if there's only 1 valid value
+ *  for it. if yes - sets it (by push it to the stack and go over the stack after), print the action and insert it
+ *  to the undoList (again - by go over the stack)
+ *
+ *  @param board - the actual game board
+ *  @param undoList - pointer to the undo list
+ *  @return -
+ */
 void autoFill(Board *board,List *undoList)
 {
 	int i,j;
@@ -199,6 +210,8 @@ void autoFill(Board *board,List *undoList)
 			printf("Error: malloc has failed\n");
 			exit(0);
 		}
+
+	/* check for each cell if there's only 1 valid value for it */
 	for (i=0;i<N; i++){
 		for (j=0; j<N; j++){
 			if(board->cells[i][j].value!=0)
@@ -214,6 +227,7 @@ void autoFill(Board *board,List *undoList)
 					}
 				}
 
+			/*if there's only 1 valid value for the cell, push it to the stack and print the set*/
 			if (theOption != 0){
 				push(stack,i,j,theOption);
 				printf("Cell <%d,%d> set to %d\n",j+1,i+1,theOption);
@@ -228,6 +242,7 @@ void autoFill(Board *board,List *undoList)
 			printf("Error: malloc has failed\n");
 			exit(0);
 		}
+	/* go over the stack and set the values for the cells */
 	while(!isEmpty(stack)){
 		pop(stack,poppedNode);
 		prevValue = board->cells[poppedNode->column][poppedNode->row].value;
@@ -246,7 +261,7 @@ void autoFill(Board *board,List *undoList)
 	destroyStack(stack);
 }
 
-/* this function will we erased as soon as we finish our test on num solutions */
+/* this function will we erased as soon as we finish our test on num solutions REPLACE: NEED TO DELETE IT??? */
 int countDetBacktracking(Board* board)
 {
 	int i,j,k;
@@ -368,6 +383,18 @@ int getNumSolutions(Board* board)
 	return count; /* return the number of possible solutions */
 }
 
+/*
+ * markErrors
+ *
+ *  This function is called after a cell was change - therefore gets the gameboard and a specific cell -
+ *  meaning row and column. it goes over the row, the column and the block and mark error each cell that was affected by
+ *  the set action.
+ *
+ *  @param board - the actual game board
+ *  @param row - the cell's row
+ *  @param column - the cell's column
+ *  @return -
+ */
 void markErrors(Board *board, int row, int column)
 {
     int i,j;
@@ -380,24 +407,27 @@ void markErrors(Board *board, int row, int column)
 	m=board->m;
 	boardsize=board->boardsize;
 
+	/*gets the upper left cell of the block - the "first" cell*/
 	modifiedRow = (row/m)*m;
 	modifiedColumn = (column/n)*n;
     for (i=0;i<boardsize; i++)
     {
+    	/*goes over the column - mark and unmark errors if needed*/
     	value = board->cells[row][i].value;
     	if(value !=0)
     	{
-    		board->cells[row][i].value = 0;
-        	if (isValid(board, row, i, value))
-    			board->cells[row][i].error = 0;
+    		board->cells[row][i].value = 0; /*change the specific chcecked cell's value to 0 - that's how isValid works*/
+        	if (isValid(board, row, i, value)) /*check if the value is valid*/
+    			board->cells[row][i].error = 0; /*it is - error = 0*/
         	else
-        		board->cells[row][i].error = 1;
+        		board->cells[row][i].error = 1; /*it's not - error = 1*/
 
-        	board->cells[row][i].value = value;
+        	board->cells[row][i].value = value; /*change it back to the original value*/
     	}
     	else
-    		board->cells[row][i].error = 0;
+    		board->cells[row][i].error = 0; /*the value is 0 there for cannot be an error*/
 
+    	/*goes over the row - mark and unmark errors if needed*/
     	value = board->cells[i][column].value;
     	if(value !=0)
     	{
@@ -413,10 +443,10 @@ void markErrors(Board *board, int row, int column)
     		board->cells[i][column].error = 0;
     }
 
+    /*goes over the block - mark and unmark errors if needed*/
     for (i=0;i<m; i++)
         for (j=0;j<n; j++)
         {
-
         	value = board->cells[modifiedRow+i][modifiedColumn+j].value;
         	if(value !=0)
         	{
@@ -433,6 +463,16 @@ void markErrors(Board *board, int row, int column)
         }
 }
 
+
+/*
+ * isThereAnError
+ *
+ *  This function gets the gameboard and check if there's any cell marked with error. it assumes the cells are marked
+ *  correctly, meaning that markErrors or markAllBoardErrors was called before
+ *
+ *  @param board - the actual game board
+ *  @return - 1 if there's at least 1 error in the board, 0 otherwise
+ */
 int isThereAnError(Board *board){
 	int i,j, size;
 	size=board->boardsize;
@@ -445,6 +485,16 @@ int isThereAnError(Board *board){
 	return 0;
 }
 
+/*
+ * markAllBoardErrors
+ * REPLACE - check if it is correctly, modified isn't even used
+ * REPLACE - document it after
+ *
+ *  This function gets the gameboard goes over all the cells and update their error value by checking if it is valid
+ *
+ *  @param board - the actual game board
+ *  @return -
+ */
 void markAllBoardErrors(Board* board){
     int row,column;
     int n,m,boardsize;
@@ -460,17 +510,20 @@ void markAllBoardErrors(Board* board){
 	m=board->m;
 	boardsize=board->boardsize;
 
+	/*goes over all the cells in the board*/
 	for(row=0;row<boardsize;row++)
 		for(column=0;column<boardsize;column++)
 		{
+			/* only unfixed cells can be erroneous */
 			if(!board->cells[row][column].fixed)
 			{
 				modifiedRow = (row/m)*m;
 				modifiedColumn = (column/n)*n;
 				value = board->cells[row][column].value;
-				board->cells[row][column].value = 0;
-				if (value!=0)
+				board->cells[row][column].value = 0; /*again - sets the value to 0 in order that isValid will work*/
+				if (value!=0) /*only cells with values can be erroneous*/
 				{
+					/*check if it is valid and update the error sign oppositely*/
 					board->cells[row][column].error = !isValid(board,row,column,value);
 					/*
 					if(board->cells[row][column].error==1)
@@ -478,7 +531,7 @@ void markAllBoardErrors(Board* board){
 					*/
 				}
 
-				board->cells[row][column].value = value;
+				board->cells[row][column].value = value; /*change it back to the original value*/
 			}
 
 		}
