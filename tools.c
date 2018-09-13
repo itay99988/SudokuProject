@@ -49,8 +49,10 @@ int save (Board* board, char *path, int gameMode)
 				/* prints '.' for fixed cells - if edit mode - fix the values */
 				if (board->cells[i][j].fixed==1 || (gameMode==2 && board->cells[i][j].value!=0))
 					fprintf(f,".");
+				/*
 				else
 					fprintf(f," ");
+				*/
 				fprintf(f, " ");
 			}
 			fprintf(f,"\n");
