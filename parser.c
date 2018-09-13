@@ -46,7 +46,7 @@ void read()
 	else if(inputValidation==0){
 		printf("Error: invalid command\n");
 	}
-	else { exit(0); /*GOT EOF, therefore exits*/ }
+	else { exitGame(userBoard, undoList); /*GOT EOF, therefore exits*/ }
 
 	while(1)
 	{
@@ -103,7 +103,7 @@ void read()
 		else if(inputValidation==0){
 			printf("Error: invalid command\n");
 		}
-		else { exit(0); /*GOT EOF, therefore exits*/ }
+		else { exitGame(userBoard, undoList); /*GOT EOF, therefore exits*/ }
 	}
 	exitGame(userBoard, undoList); 	/*NEED TO EXIT*/
 }
