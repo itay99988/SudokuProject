@@ -241,8 +241,6 @@ void doGenerate(Board* userBoard, List* undoList, char* first, char* second){
 				printBoard(userBoard);
 		}
 	}
-
-
 }
 
 /*

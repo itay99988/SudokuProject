@@ -130,7 +130,7 @@ int generate(Board* userBoard, List *undoList, int x, int y){
 			pickedXCells=1;
 			continue;
 		}
-		/* move on to the next pary only iff the new temp board is solvable */
+		/* move on to the next part if and only if the new temp board is solvable */
 		isBoardSolvable = ilpSolve(userBoard);
 		if(!isBoardSolvable){
 			resetBoard(userBoard);
