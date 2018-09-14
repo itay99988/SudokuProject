@@ -257,6 +257,9 @@ void autoFill(Board *board,List *undoList)
 		updateMovesInNode(&newNode,moves, movesNum);
 		addMove(undoList,newNode);
 	}
+	else{
+		free(moves);
+	}
 	free(poppedNode);
 	destroyStack(stack);
 }
