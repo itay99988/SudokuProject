@@ -34,8 +34,8 @@ void read()
 	List* undoList = NULL;
 	Board* userBoard = NULL;
 	printf("Enter your command:\n");
-	inputValidation=getACommand(input);
-	if(inputValidation!=0) {
+	inputValidation=getACommand(input); /*reads from user*/
+	if(inputValidation!=0) { /*cut it into words according to the delimiters*/
 			string[i]=strtok(input,delimiters);
 			while(string[i]!=NULL){
 				i++;
@@ -43,7 +43,7 @@ void read()
 			}
 
 			if(inputValidation==2)
-				exit=1;
+				exit=1; /*mark exit with 1, after it does the command we will know to exit*/
 	}
 	else if(inputValidation==0){
 		printf("Error: invalid command\n");
@@ -85,7 +85,7 @@ void read()
 				{ exitGame(userBoard, undoList); }
 			else { printf("Error: invalid command\n"); }
 
-			if(!exit)
+			if(!exit) /*if the command ended with EOF*/
 				printf("Enter your command:\n");
 		}
 

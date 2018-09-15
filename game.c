@@ -54,7 +54,7 @@ Board* init(int n, int m){
 	for(k=0;k<size;k++)
 	{
 		for(l=0;l<size;l++)
-		{
+		{  /*the initial values of the cell*/
 			board[k][l].value = 0;
 			board[k][l].fixed = 0;
 			board[k][l].error = 0;
@@ -107,7 +107,7 @@ void printBoard(Board *board)
 	for (i=0; i<N; i++)
 	{
 		if (i%m==0)
-		{
+		{	/*prints the ----- */
 			for (k = 0; k < 4*N + m +1; k++)
 			    printf("-");
 			printf("\n");
@@ -127,6 +127,7 @@ void printBoard(Board *board)
 				else
 				    specialSign = ' ';
 
+			/*prints specia sign if needed - error or fixed*/
 			if (board->cells[i][j].value==0)
 				printf("  %c",specialSign);
 			else
@@ -136,6 +137,7 @@ void printBoard(Board *board)
 		printf("|\n");
 
 	}
+	/*prints the ----- */
     for (k = 0; k < 4*N + m +1; k++)
 	    printf("-");
 	printf("\n");
@@ -158,6 +160,7 @@ int set(Board *board, List *undoList, int x, int y, int z, int gameMode)
 	int prevValue;
 	int** moves;
 	Node* newNode = NULL;
+	/* cannot set if fixed */
 	if(board->cells[x][y].fixed == 1)
 	{
 		printf("Error: cell is fixed\n");
@@ -183,7 +186,7 @@ int set(Board *board, List *undoList, int x, int y, int z, int gameMode)
 	markErrors(board,x,y);
 	printBoard(board);
 
-	if (gameMode==1)  /*relevant only to solve mode */
+	if (gameMode==1)  /*checking if game is finished - relevant only to solve mode */
 	{
 		if(isBoardFull(board))
 		{

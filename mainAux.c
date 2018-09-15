@@ -78,7 +78,7 @@ void doSolve(char *path, Board** userBoard, List** undoList,int* mode, int curre
 	else
 	{
 		(*mode) = 1; /* start a puzzle in solve mode */
-		destroyBoard(*userBoard);
+		destroyBoard(*userBoard); /*destroy the last board and free the memory*/
 		load(path,userBoard,*mode);
 		destroyList(*undoList);
 		(*undoList) = initList();

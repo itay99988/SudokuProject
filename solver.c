@@ -45,10 +45,12 @@ int isValid(Board *board, int row, int column, int value)
 	modifiedColumn = (column/n)*n;
     for (i=0;i<boardsize; i++)
     {
+    	/* check if it is valid value in the row t=and the column */
     	if (board->cells[row][i].value==value || board->cells[i][column].value==value)
             return 0;
     }
 
+    /* check if it is valid value in the box */
     for (i=0;i<m; i++)
         for (j=0;j<n; j++)
         {
@@ -88,7 +90,6 @@ int validate(Board* board){
  *  @param y - as shown in the description
  *  @return -1 if function succeeded, 0 if not.
  */
-
 int generate(Board* userBoard, List *undoList, int x, int y){
 	/* assuming the board is empty, we are in edit mode, and x,y are valid integers */
 	int i,j,l,N,randRow,randCol, chosenValue;
@@ -264,40 +265,6 @@ void autoFill(Board *board,List *undoList)
 	destroyStack(stack);
 }
 
-/* this function will we erased as soon as we finish our test on num solutions REPLACE: NEED TO DELETE IT??? */
-int countDetBacktracking(Board* board)
-{
-	int i,j,k;
-	int size;
-	int count;
-	count=0;
-
-	/* dimensions definition: */
-	size=board->boardsize;
-
-	for(i=0;i<size;i++)
-	{
-		for(j=0;j<size;j++)
-		{
-			if(board->cells[i][j].fixed==0 && board->cells[i][j].value==0)
-			{
-				for (k=1;k<=size;k++)
-				{
-					if (isValid(board,i, j, k)==1)
-					{
-						board->cells[i][j].value = k;
-						count = count + countDetBacktracking(board);
-					}
-				}
-
-				board->cells[i][j].value=0;
-				return count;
-			}
-		}
-	}
-
-	return 1;
-}
 /*
  * getNumSolutions
  *
