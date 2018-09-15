@@ -339,7 +339,10 @@ void doSet(Board* userBoard, List* undoList, char* first, char* second,char* thi
  *  @return -
  */
 void doMarkErrors(Board* userBoard, char* first, int* lastBoardMarkErrors){
-	if (strcmp(first,"1")==0 || strcmp(first,"0")==0) /* field can be only 0 or 1 */
+	int value;
+	value = atoi(first);
+
+	if(isInt(first) && value>=0 && value<=1) /* field can be only 0 or 1 */
 	{
 		userBoard ->markErrors = atoi(first);
 		(*lastBoardMarkErrors) = atoi(first);
