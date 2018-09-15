@@ -283,16 +283,17 @@ int getNumSolutions(Board* board)
 	int i=0,j=0,size,foundVal,count;
 	StackNode* poppedNode;
 	Stack* stack = initStack();
-
 	size=board->boardsize;
 	count=0,foundVal=0;
+
+	if(!validate(board)) /* in case of a non-valid board, we can quit now and return 0*/
+		return 0;
+
 	/* memory allocated for the nodes that are about to be popped */
 	poppedNode = malloc(sizeof(StackNode));
 	if (poppedNode == NULL) {
 		exit(0);
 	}
-	if(!validate(board))
-		return 0;
 	/* find the first cell to deal with */
 	foundVal = findFirstCell(board, &i, &j);
 	/* in case the board is full and valid */
