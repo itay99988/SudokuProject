@@ -29,19 +29,21 @@ int getACommand(char* input);
 void read()
 { /*REPLACE - document!!!*/
 	/* Game mode: 0 - Init, 1 - Solve, 2 - Edit */
-	int mode = 0, i = 0, currentMarkErrors = 1, inputValidation; /* mode - starts in Init mode */
+	int mode = 0, i = 0, currentMarkErrors = 1, inputValidation, exit=0; /* mode - starts in Init mode */
 	char input[256] = {'\0'}, *string[256],delimiters[] = " \t\r\n";
 	List* undoList = NULL;
 	Board* userBoard = NULL;
-	/*const int initialBoardDimension = 3;  according to the forum  is 3*3 - want to change it to define???, was moved to game.c*/
 	printf("Enter your command:\n");
 	inputValidation=getACommand(input);
-	if(inputValidation==1) {
+	if(inputValidation!=0) {
 			string[i]=strtok(input,delimiters);
 			while(string[i]!=NULL){
 				i++;
 				string[i]=strtok(NULL,delimiters);
 			}
+
+			if(inputValidation==2)
+				exit=1;
 	}
 	else if(inputValidation==0){
 		printf("Error: invalid command\n");
@@ -50,7 +52,7 @@ void read()
 
 	while(1)
 	{
-		if(string[0]!='\0' && inputValidation){
+		if(string[0]!='\0' && inputValidation!=0){
 			if ((strcmp(string[0],"set")==0) && string[1]!=NULL && string[2]!=NULL && string[3]!=NULL && (mode==1 || mode==2)) /*available in solve or edit*/
 				{ doSet(userBoard,undoList, string[1], string[2], string[3],&mode); }
 			else if (strcmp(string[0],"hint")==0 && string[1]!=NULL && string[2]!=NULL && mode==1) /*available only in solve*/
@@ -83,9 +85,12 @@ void read()
 				{ exitGame(userBoard, undoList); }
 			else { printf("Error: invalid command\n"); }
 
-			printf("Enter your command:\n");
+			if(!exit)
+				printf("Enter your command:\n");
 		}
-		else { printf("Enter your command:\n"); }
+
+		if (exit)
+			exitGame(userBoard, undoList);
 
 		/* just re-initial the input with invalid chars\commands */
 		for (i=0;i<256;i++)
@@ -93,12 +98,16 @@ void read()
 
 		i=0;
 		inputValidation=getACommand(input);
-		if(inputValidation==1) {
+		if(inputValidation!=0) {
 				string[i]=strtok(input,delimiters);
 				while(string[i]!=NULL){
 					i++;
 					string[i]=strtok(NULL,delimiters);
 				}
+
+				if(inputValidation==2)
+					exit=1;
+
 		}
 		else if(inputValidation==0){
 			printf("Error: invalid command\n");
@@ -133,7 +142,11 @@ int getACommand(char* input){
 		}
 
 		if (ch==EOF)
+		{
+			input[i]='\0';
+			printf("\n");
 			return 2; /*2 for exit*/
+		}
 
 		input[i]=ch;
 		i++;
