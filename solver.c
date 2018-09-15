@@ -14,6 +14,8 @@
 #include "mainAux.h"
 #include "ILPSolver.h"
 
+#define GENERATE_ITERS 1000 /* maximum size of iterations in the generate function */
+
 /* private methods declaration: */
 void markErrors(Board *board, int row, int column);
 int findFirstCell(Board* board, int* x, int* y);
@@ -105,7 +107,7 @@ int generate(Board* userBoard, List *undoList, int x, int y){
 	/* try to fill the board with x randomly chosen cells with randomly chosen legal values
 	 * only 1000 times.
 	 */
-	for(i=0;i<1000;i++){
+	for(i=0;i<GENERATE_ITERS;i++){
 		for(j=0;j<x;j++){
 			/* randomly choose x cells */
 			randRow = rand()%N;
@@ -457,8 +459,6 @@ int isThereAnError(Board *board){
 
 /*
  * markAllBoardErrors
- * REPLACE - check if it is correctly, modified isn't even used
- * REPLACE - document it after
  *
  *  This function gets the gameboard goes over all the cells and update their error value by checking if it is valid
  *
@@ -467,17 +467,10 @@ int isThereAnError(Board *board){
  */
 void markAllBoardErrors(Board* board){
     int row,column;
-    int n,m,boardsize;
-    int modifiedRow, modifiedColumn;
+    int boardsize;
     int value;
 
-    modifiedRow = 0; /*just for initialization*/
-    modifiedColumn = 0; /*just for initialization*/
-    n=modifiedRow*modifiedColumn; /*just for using the variables*/
-
     /* dimensions definition: */
-	n=board->n;
-	m=board->m;
 	boardsize=board->boardsize;
 
 	/*goes over all the cells in the board*/
@@ -487,8 +480,6 @@ void markAllBoardErrors(Board* board){
 			/* only unfixed cells can be erroneous */
 			if(!board->cells[row][column].fixed)
 			{
-				modifiedRow = (row/m)*m;
-				modifiedColumn = (column/n)*n;
 				value = board->cells[row][column].value;
 				board->cells[row][column].value = 0; /*again - sets the value to 0 in order that isValid will work*/
 				if (value!=0) /*only cells with values can be erroneous*/

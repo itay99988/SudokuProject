@@ -17,14 +17,14 @@
 #include "tools.h"
 #include "ILPSolver.h"
 
+#define INITBOXSIZE 3 /* A constant for initial block size */
+
 /* private methods declaration: */
 void addOption(int *options, int value, int boardsize);
 void removeOption(int *options, int index, int boardsize);
 int* copyOption(int *options, int size);
 void resetOption(int *options, int size);
 void printArray(int *arr, int size);
-void markAsFixed(Board *currentBoard);
-void clearFixed(Board *currentBoard);
 int isInt(char* string);
 
 /* Public methods: */
@@ -125,7 +125,7 @@ void doEdit(char *path,Board** userBoard, List** undoList, int* mode)
 		destroyBoard(*userBoard);
 		(*mode) = 2; /* start a puzzle in edit mode */
 		/* need to initilalize an empty board */
-		*userBoard = init(3,3); /* initiate 3*3 - maybe change it to a DEFINE or something REPLACE*/
+		*userBoard = init(INITBOXSIZE,INITBOXSIZE); /* initiate 3*3 - maybe change it to a DEFINE or something REPLACE*/
 		(*userBoard)->markErrors = 1;/* mark errors parameter is 1 */
 		destroyList(*undoList);
 		*undoList = initList();
@@ -606,27 +606,6 @@ void resetOption(int *options, int size)
 	for(k=0;k<size;k++){
 		options[k] = 0;
 	}
-}
-
-/* not in use right now. did you want to use it? REPLACE */
-void markAsFixed(Board *currentBoard){
-	int i, j;
-	int size = currentBoard->boardsize;
-
-	for (i =0; i<size; i++)
-		for (j =0; j<size; j++)
-			if(currentBoard->cells[i][j].value!=0)
-				currentBoard->cells[i][j].fixed=1;
-}
-
-/* not in use right now. did you want to use it? REPLACE*/
-void clearFixed(Board *currentBoard){
-	int i, j;
-	int size = currentBoard->boardsize;
-
-	for (i =0; i<size; i++)
-		for (j =0; j<size; j++)
-				currentBoard->cells[i][j].fixed=0;
 }
 
 /*

@@ -15,6 +15,7 @@
 #include "mainAux.h"
 #include "ILPSolver.h"
 
+#define MAXLINELEN 255 /* A constant for maximum command length */
 /* private methods declaration: */
 int getACommand(char* input);
 
@@ -27,12 +28,13 @@ int getACommand(char* input);
  *  @return -
  */
 void read()
-{ /*REPLACE - document!!!*/
+{
 	/* Game mode: 0 - Init, 1 - Solve, 2 - Edit */
 	int mode = 0, i = 0, currentMarkErrors = 1, inputValidation, exit=0; /* mode - starts in Init mode */
 	char input[256] = {'\0'}, *string[256],delimiters[] = " \t\r\n";
 	List* undoList = NULL;
 	Board* userBoard = NULL;
+	/* initialization purpose only */
 	string[0]="!";
 	printf("Enter your command:\n");
 	inputValidation=getACommand(input); /*reads from user*/
@@ -92,7 +94,6 @@ void read()
 		/* just re-initial the input with invalid chars\commands */
 		for (i=0;i<256;i++)
 			input[i]='!';
-
 		i=0;
 		inputValidation=getACommand(input);
 		if(inputValidation==1 || inputValidation==2) {
@@ -104,7 +105,6 @@ void read()
 
 				if(inputValidation==2)
 					exit=1;
-
 		}
 		else if(inputValidation==0){
 			printf("Error: invalid command\n");
@@ -129,10 +129,11 @@ void read()
 int getACommand(char* input){
 	int i=0;
 	char ch;
-
+	/* read from user char by char */
 	while((ch=fgetc(stdin)) != '\n')
 	{
-		if(i>255) /* REPLACE the magic number */
+		/* if command is over 256 chars */
+		if(i>MAXLINELEN)
 		{
 			while((ch = fgetc(stdin)) != '\n' && ch != EOF); /* skipping every char after 256 chars */
 			if (ch==EOF)
