@@ -33,9 +33,10 @@ void read()
 	char input[256] = {'\0'}, *string[256],delimiters[] = " \t\r\n";
 	List* undoList = NULL;
 	Board* userBoard = NULL;
+	string[0]="!";
 	printf("Enter your command:\n");
 	inputValidation=getACommand(input); /*reads from user*/
-	if(inputValidation!=0) { /*cut it into words according to the delimiters*/
+	if(inputValidation==1 || inputValidation==2) { /*cut it into words according to the delimiters*/
 			string[i]=strtok(input,delimiters);
 			while(string[i]!=NULL){
 				i++;
@@ -52,7 +53,7 @@ void read()
 
 	while(1)
 	{
-		if(string[0]!='\0' && inputValidation!=0){
+		if(string[0]!='\0' && (inputValidation==1 || inputValidation==2)){
 			if ((strcmp(string[0],"set")==0) && string[1]!=NULL && string[2]!=NULL && string[3]!=NULL && (mode==1 || mode==2)) /*available in solve or edit*/
 				{ doSet(userBoard,undoList, string[1], string[2], string[3],&mode); }
 			else if (strcmp(string[0],"hint")==0 && string[1]!=NULL && string[2]!=NULL && mode==1) /*available only in solve*/
@@ -84,21 +85,17 @@ void read()
 			else if (strcmp(string[0],"exit")==0) /*available in every mode*/
 				{ exitGame(userBoard, undoList); }
 			else { printf("Error: invalid command\n"); }
-
-			if(!exit) /*if the command ended with EOF*/
-				printf("Enter your command:\n");
 		}
-
-		if (exit)
+		if (exit)/*if got EOF in the middle of the command*/
 			exitGame(userBoard, undoList);
-
+		printf("Enter your command:\n");
 		/* just re-initial the input with invalid chars\commands */
 		for (i=0;i<256;i++)
 			input[i]='!';
 
 		i=0;
 		inputValidation=getACommand(input);
-		if(inputValidation!=0) {
+		if(inputValidation==1 || inputValidation==2) {
 				string[i]=strtok(input,delimiters);
 				while(string[i]!=NULL){
 					i++;
@@ -127,7 +124,7 @@ void read()
  *
  *  This function reads char by char input from the user and insert it to its input.
  *  @param input - a string
- *  @return - 0 for error, 1 for good, 2 for EOF
+ *  @return - 0 for error, 1 for good, 2 for EOF, 3 for long input with EOF
  */
 int getACommand(char* input){
 	int i=0;
@@ -135,9 +132,14 @@ int getACommand(char* input){
 
 	while((ch=fgetc(stdin)) != '\n')
 	{
-		if(i>256) /* REPLACE the magic number */
+		if(i>255) /* REPLACE the magic number */
 		{
 			while((ch = fgetc(stdin)) != '\n' && ch != EOF); /* skipping every char after 256 chars */
+			if (ch==EOF)
+			{
+				printf("\n");
+				return 3;
+			}
 			return 0;
 		}
 
