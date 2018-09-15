@@ -78,7 +78,7 @@ int load (char *path, Board** board, int mode)
 {
 	int size, i=0, j=0, m, n, firstCycle=1;
 	FILE *f = fopen(path, "r");
-    char line[1024];
+    char line[2048];
     char * data;
     char delimiters[] = " \t\r\n";
     i = 0, j = 0;
