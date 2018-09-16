@@ -97,7 +97,6 @@ Board* init(int n, int m){
  */
 void printBoard(Board *board)
 {
-	/*need to update n,m and N */
 	int i,j,k;
 	int n,m,N;
 	char specialSign;
@@ -127,7 +126,7 @@ void printBoard(Board *board)
 				else
 				    specialSign = ' ';
 
-			/*prints specia sign if needed - error or fixed*/
+			/*prints special sign if needed - error or fixed*/
 			if (board->cells[i][j].value==0)
 				printf("  %c",specialSign);
 			else

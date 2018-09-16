@@ -30,7 +30,7 @@ int save (Board* board, char *path, int gameMode)
 	int n,m,size;
 	FILE *f = fopen(path, "w");
 
-	/*definitions of dimentions: */
+	/*definitions of dimensions: */
 	n=board->n, m=board->m, size=board->boardsize;
 
 	if (f == NULL)
@@ -49,10 +49,7 @@ int save (Board* board, char *path, int gameMode)
 				/* prints '.' for fixed cells - if edit mode - fix the values */
 				if (board->cells[i][j].fixed==1 || (gameMode==2 && board->cells[i][j].value!=0))
 					fprintf(f,".");
-				/*
-				else
-					fprintf(f," ");
-				*/
+
 				fprintf(f, " ");
 			}
 			fprintf(f,"\n");
@@ -95,12 +92,11 @@ int load (char *path, Board** board, int mode)
 			/* first - initiate the board according to the size */
 			m = (strtok(line,delimiters))[0]-'0';
 			n = (strtok(NULL,delimiters))[0]-'0';
-			/*printf("m=%d, n=%d\n",m,n);*/
+
 			size = m*n;
 			*board = init(n,m);
 
 			do {
-				/*printf("%s\n",line);*/
 				/*need to get the values from the line*/
 				/* skip the m and n parameters if this is the first line */
 				if (firstCycle)
@@ -113,7 +109,6 @@ int load (char *path, Board** board, int mode)
 
 				while ((i+1)*(j+1)<=size*size && data!=NULL)
 				{
-					/*printf("%s ",data);*/
 					if (data[strlen(data)-1] == '.')
 					{
 						if(mode==1) /*solve MODE*/
@@ -124,10 +119,9 @@ int load (char *path, Board** board, int mode)
 					}
 
 					(*board)->cells[i][j].value = atoi(data);
-					/*printf("\n");*/
 
 					data = strtok(NULL,delimiters); /*skip a delimiter*/
-					/* instead of for loop, calculate the i,j values "handly" */
+					/* instead of for loop, calculate the i,j values manually */
 					if (j<size-1)
 					{ j++; }
 					else

@@ -120,12 +120,12 @@ void doEdit(char *path,Board** userBoard, List** undoList, int* mode)
 			fclose(fp);
 		}
 	}
-	else /* there isn't a parameter - initalize an empty board */
+	else /* there isn't a parameter - initialize an empty board */
 	{
 		destroyBoard(*userBoard);
 		(*mode) = 2; /* start a puzzle in edit mode */
-		/* need to initilalize an empty board */
-		*userBoard = init(INITBOXSIZE,INITBOXSIZE); /* initiate 3*3 - maybe change it to a DEFINE or something REPLACE*/
+		/* need to initialize an empty board */
+		*userBoard = init(INITBOXSIZE,INITBOXSIZE);
 		(*userBoard)->markErrors = 1;/* mark errors parameter is 1 */
 		destroyList(*undoList);
 		*undoList = initList();
@@ -534,7 +534,7 @@ int isBoardFull(Board *currentBoard)
 {
 	int i, j;
 	int size = currentBoard->boardsize;
-
+	/* check that each one of the cells is not empty */
 	for (i =0; i<size; i++)
 		for (j =0; j<size; j++)
 			if(currentBoard->cells[i][j].value==0)
@@ -683,12 +683,12 @@ int isInt(char *string)
 
         for(i = 0; i < stringLength; i++)
         {
-                if(isdigit(string[i]) == 0) /*|| ispunct(string[i]) != 0 ... */
+                if(isdigit(string[i]) == 0)
                         break;
         }
 
         if(i != stringLength)
-                return 0;
+			return 0;
         else
-                return 1;
+			return 1;
 }

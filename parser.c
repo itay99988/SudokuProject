@@ -1,7 +1,7 @@
 /*
  * Parser Module
  *
- *  This module is in charge of reading the commands and call theright methods.
+ *  This module is in charge of reading the commands and call the right methods.
  */
 
 #include <stdio.h>
@@ -91,7 +91,7 @@ void read()
 		if (exit)/*if got EOF in the middle of the command*/
 			exitGame(userBoard, undoList);
 		printf("Enter your command:\n");
-		/* just re-initial the input with invalid chars\commands */
+		/* just re-initialize the input with invalid chars\commands */
 		for (i=0;i<256;i++)
 			input[i]='!';
 		i=0;

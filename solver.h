@@ -5,7 +5,7 @@
  * Solver Module
  *
  *  This module is in charge of the game's solution. every function which is related to
- *  a specific operation/stage in the solution is here. (such as isValid value for a cell, deterministic BackTracking , randomized backTracking , etc)
+ *  a specific operation/stage in the solution is here. (such as isValid value for a cell, num_solutions, validate, etc)
  */
 
 #include "game.h"
